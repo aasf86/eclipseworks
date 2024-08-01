@@ -1,16 +1,17 @@
 ﻿/*Script de criação de tabelas eclipseworks*/
 /*aasf86 remover comentarios não usados*/
 
-create table if not exists "Project"
+create table if not exists project
+--create table project
 (
 	Id bigserial not null primary key,
-    "Guid" uuid DEFAULT gen_random_uuid(), 
-    "Inserted" timestamp without time zone NOT NULL DEFAULT now(),
-    "Updated" timestamp without time zone NOT NULL DEFAULT now(),
-    "LastEventByUser" varchar(100),
+    Guid uuid DEFAULT gen_random_uuid(), 
+    Inserted timestamp without time zone NOT NULL DEFAULT now(),
+    Updated timestamp without time zone NOT NULL DEFAULT now(),
+    LastEventByUser varchar(100),
 
-    "Name" varchar(250) not null, /*aasf86 faltou definir o size no pedido, colocar isso na 2ª fase*/
-    "UserOwner" varchar(100)
+    Name varchar(250) not null, /*aasf86 faltou definir o size no pedido, colocar isso na 2ª fase*/
+    UserOwner varchar(100)
 );
 
 ---------------

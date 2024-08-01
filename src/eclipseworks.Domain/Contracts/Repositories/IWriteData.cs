@@ -8,6 +8,6 @@ namespace eclipseworks.Domain.Contracts.Repositories
         void SetTransaction(IDbTransaction dbTransaction);
         Task Insert(TEntity entity);
         Task Update(TEntity entity);
-        Task<bool> Delete(long id);
+        Task<bool> Delete(TEntity entity);
     }
 }

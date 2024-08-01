@@ -6,7 +6,6 @@ using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using static eclipseworks.Domain.Entities.Project;
-using Entity = eclipseworks.Domain.Entities;
 
 namespace eclipseworks.Business.UseCases.Project
 {
@@ -56,7 +55,7 @@ namespace eclipseworks.Business.UseCases.Project
                     //aasf86 verificar no já cadastrado
 
                     await ProjectRepository.Insert(projectEntity);
-                    
+                    projectInsertResponse.Data.SetId(projectEntity.Id.ToString());
                 });
 
                 return projectInsertResponse;
@@ -98,6 +97,12 @@ namespace eclipseworks.Business.UseCases.Project
                 {
                     var projectFromDb = await ProjectRepository.GetById(long.Parse(projectGet.Id));
 
+                    if (projectFromDb is null) 
+                    {
+                        projectGetResponse.Errors.Add(ProjectMsgDialog.NotFound);
+                        return;
+                    }
+
                     projectGetResponse.Data = new ProjectGet 
                     { 
                         Id = projectFromDb.Id.ToString(),
@@ -122,175 +127,107 @@ namespace eclipseworks.Business.UseCases.Project
                 return projectGetResponse;
             }
         }
-        /*
-                public async Task<ResponseBase<ProjectGet>> GetByPlate(RequestBase<ProjectGet> ProjectGetRequest)
+
+        public async Task<ResponseBase<ProjectDelete>> Delete(RequestBase<ProjectDelete> projectDeleteRequest)
+        {
+            try
+            {
+                "Iniciando [Delete] do projeto: {ProjectId}".LogInf(projectDeleteRequest.Data.Id);
+
+                var projectDelete = projectDeleteRequest.Data;
+                var projectDeleteResponse = ResponseBase.New(projectDelete, projectDeleteRequest.RequestId);
+                var result = Validate(projectDelete);
+
+                if (!result.IsSuccess)
                 {
-                    try
-                    {
-        #if !DEBUG
-                        if (!IsInRole(RoleTypeeclipseworks.Admin)) throw new UnauthorizedAccessException();
-        #endif
-
-                        "Iniciando [GetByPlate] de motocicleta: {Plate}".LogInf(ProjectGetRequest.Data.Plate);                
-
-                        var ProjectGet = ProjectGetRequest.Data;
-                        var ProjectGetResponse = ResponseBase.New(ProjectGet, ProjectGetRequest.RequestId);
-                        var result = Validate(ProjectGet);                
-
-                        if (!result.IsSuccess)
-                        {
-                            ProjectGetResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
-                            var errors = string.Join("\n", ProjectGetResponse.Errors.ToArray());
-                            $"Motocicleta inválida '{{Plate}}': {errors} ".LogWrn(ProjectGet.Plate);
-                            return ProjectGetResponse;
-                        }
-
-                        await UnitOfWorkExecute(async () =>
-                        {
-                            var motocycleFromDb = await ProjectRepository.GetByPlate(ProjectGet.Plate);
-
-                            if (motocycleFromDb is null)
-                            {
-                                ProjectGetResponse.Errors.Add(ProjectMsgDialog.NotFound);
-                                $"{ProjectMsgDialog.NotFound} '{{Plate}}'".LogWrn();
-                                return;
-                            }
-
-                            ProjectGetResponse.Data.Year = motocycleFromDb.Year;
-                            ProjectGetResponse.Data.Model = motocycleFromDb.Model;
-                            ProjectGetResponse.Data.Id = motocycleFromDb.Id;
-                        });
-
-                        return ProjectGetResponse;
-                    }
-                    catch (Exception exc)
-                    {
-                        "Erro ao [GetByPlate] motocicleta: {Plate}".LogErr(ProjectGetRequest.Data.Plate);
-                        exc.Message.LogErr(exc);
-
-                        var ProjectGetResponse = ResponseBase.New(ProjectGetRequest.Data, ProjectGetRequest.RequestId);
-        #if DEBUG
-                        ProjectGetResponse.Errors.Add(exc.Message);
-        #endif
-                        ProjectGetResponse.Errors.Add("Erro ao obter motocicleta.");
-
-                        return ProjectGetResponse;                
-                    }         
+                    projectDeleteResponse.Errors.Add(ProjectMsgDialog.InvalidId);
+                    return projectDeleteResponse;
                 }
 
-                public async Task<ResponseBase<ProjectUpdate>> Update(RequestBase<ProjectUpdate> ProjectUpdateRequest)
+                await UnitOfWorkExecute(async () =>
                 {
-                    try
+                    var projectFromDb = await ProjectRepository.GetById(long.Parse(projectDelete.Id));
+
+                    if(projectFromDb is null)
                     {
-        #if !DEBUG
-                        if (!IsInRole(RoleTypeeclipseworks.Admin)) throw new UnauthorizedAccessException();
-        #endif
-
-                        "Iniciando [Update] de motocicleta: {Plate}".LogInf(ProjectUpdateRequest.Data.Plate);
-
-                        var ProjectUpdate = ProjectUpdateRequest.Data;
-                        var ProjectUpdateResponse = ResponseBase.New(ProjectUpdate, ProjectUpdateRequest.RequestId);
-                        var result = Validate(ProjectUpdate);
-
-                        if (!result.IsSuccess)
-                        {
-                            ProjectUpdateResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
-                            var errors = string.Join("\n", ProjectUpdateResponse.Errors.ToArray());
-                            $"Motocicleta inválida '{{Plate}}': {errors} ".LogWrn(ProjectUpdate.Plate);
-                            return ProjectUpdateResponse;
-                        }
-
-                        await UnitOfWorkExecute(async () =>
-                        {
-                            var ProjectFromDb = await ProjectRepository.GetByPlate(ProjectUpdate.Plate, ProjectUpdate.Id);
-
-                            if (ProjectFromDb is not null)
-                            {
-                                var strMsg = string.Format(ProjectMsgDialog.AlreadyRegistered, ProjectFromDb.Model);
-                                ProjectUpdateResponse.Errors.Add(strMsg);
-                                strMsg.LogWrn(ProjectFromDb?.Model);
-                                return;
-                            }
-
-                            ProjectFromDb = await ProjectRepository.GetById(ProjectUpdate.Id);
-
-                            if (ProjectFromDb is null)
-                            {
-                                ProjectUpdateResponse.Errors.Add(ProjectMsgDialog.NotFound);
-                                $"{ProjectMsgDialog.NotFound} 'Id: {{Id}}'".LogWrn(ProjectUpdate.Id);
-                                return;
-                            }
-
-                            var newProjectUpdate = new Entity.Project
-                            (
-                                ProjectFromDb.Year,
-                                ProjectFromDb.Model,
-                                ProjectUpdate.Plate
-                            )
-                            { Id = ProjectUpdate.Id };
-
-                            await ProjectRepository.Update(newProjectUpdate);
-                        });
-
-                        return ProjectUpdateResponse;
+                        projectDeleteResponse.Errors.Add(ProjectMsgDialog.NotFound);
+                        return;
                     }
-                    catch (Exception exc)
-                    {
-                        "Erro ao [Update] motocicleta: {Plate}".LogErr(ProjectUpdateRequest.Data.Plate);
-                        exc.Message.LogErr(exc);
 
-                        var ProjectUpdateResponse = ResponseBase.New(ProjectUpdateRequest.Data, ProjectUpdateRequest.RequestId);
-        #if DEBUG
-                        ProjectUpdateResponse.Errors.Add(exc.Message);
-        #endif
-                        ProjectUpdateResponse.Errors.Add("Erro ao alterar motocicleta.");
+                    projectFromDb.SetLastEventByUser(projectDelete.User);
 
-                        return ProjectUpdateResponse;                
-                    }
+                    await ProjectRepository.Update(projectFromDb);
+
+                    await ProjectRepository.Delete(projectFromDb);                    
+                });
+
+                return projectDeleteResponse;
+            }
+            catch (Exception exc)
+            {
+                "Erro [Delete] projeto: {ProjectId}".LogErr(projectDeleteRequest.Data.Id);
+                exc.Message.LogErr(exc);
+
+                var projectDeleteResponse = ResponseBase.New(projectDeleteRequest.Data, projectDeleteRequest.RequestId);
+#if DEBUG
+                projectDeleteResponse.Errors.Add(exc.Message);
+#endif
+                projectDeleteResponse.Errors.Add("Erro ao excluir motocicleta.");
+
+                return projectDeleteResponse;
+            }
+        }
+
+        public async Task<ResponseBase<ProjectUpdate>> Update(RequestBase<ProjectUpdate> projectUpdateRequest)
+        {
+            try
+            {
+                "Iniciando [Update] de projeto: {ProjectId}".LogInf(projectUpdateRequest.Data.Id);
+
+                var projectUpdate = projectUpdateRequest.Data;
+                var projectUpdateResponse = ResponseBase.New(projectUpdate, projectUpdateRequest.RequestId);
+                var result = Validate(projectUpdate);
+
+                if (!result.IsSuccess)
+                {
+                    projectUpdateResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
+                    var errors = string.Join("\n", projectUpdateResponse.Errors.ToArray());
+                    $"Projeto inválido '{{ProjectId}}': {errors} ".LogWrn(projectUpdate.Id);
+                    return projectUpdateResponse;
                 }
 
-                public async Task<ResponseBase<ProjectDelete>> Delete(RequestBase<ProjectDelete> ProjectDeleteRequest)
+                await UnitOfWorkExecute(async () =>
                 {
-                    try
+                    var  projectFromDb = await ProjectRepository.GetById(long.Parse(projectUpdate.Id));
+
+                    if (projectFromDb is null)
                     {
-        #if !DEBUG
-                        if (!IsInRole(RoleTypeeclipseworks.Admin)) throw new UnauthorizedAccessException();
-        #endif
-                        "Iniciando [Delete] de motocicleta: {Id}".LogInf(ProjectDeleteRequest.Data.Id);
-
-                        var ProjectDelete = ProjectDeleteRequest.Data;
-                        var ProjectDeleteResponse = ResponseBase.New(ProjectDelete, ProjectDeleteRequest.RequestId);
-                        var result = Validate(ProjectDelete);
-
-                        if (!result.IsSuccess)
-                        {
-                            ProjectDeleteResponse.Errors.Add(ProjectMsgDialog.InvalidId);
-                            return ProjectDeleteResponse;
-                        }
-
-                        await UnitOfWorkExecute(async () => 
-                        {
-                            var deleted = await ProjectRepository.Delete(ProjectDelete.Id);
-                            if (!deleted)
-                                ProjectDeleteResponse.Errors.Add(ProjectMsgDialog.NotFound);                    
-                        });
-
-                        return ProjectDeleteResponse;
+                        projectUpdateResponse.Errors.Add(ProjectMsgDialog.NotFound);
+                        $"{ProjectMsgDialog.NotFound} 'Id: {{Id}}'".LogWrn(projectUpdate.Id);
+                        return;
                     }
-                    catch (Exception exc)
-                    {
-                        "Erro [Delete] motocicleta: {Id}".LogErr(ProjectDeleteRequest.Data.Id);
-                        exc.Message.LogErr(exc);
 
-                        var ProjectDeleteResponse = ResponseBase.New(ProjectDeleteRequest.Data, ProjectDeleteRequest.RequestId);
-        #if DEBUG
-                        ProjectDeleteResponse.Errors.Add(exc.Message);
-        #endif
-                        ProjectDeleteResponse.Errors.Add("Erro ao excluir motocicleta.");
+                    projectFromDb.SetName(projectUpdate.Name);
+                    projectFromDb.SetLastEventByUser(projectUpdate.User);                    
 
-                        return ProjectDeleteResponse;
-                    }             
-                }
-        */
+                    await ProjectRepository.Update(projectFromDb);
+                });
+
+                return projectUpdateResponse;
+            }
+            catch (Exception exc)
+            {
+                "Erro ao [Update] projeto: {ProjectId}".LogErr(projectUpdateRequest.Data.Id);
+                exc.Message.LogErr(exc);
+
+                var projectUpdateResponse = ResponseBase.New(projectUpdateRequest.Data, projectUpdateRequest.RequestId);
+#if DEBUG
+                projectUpdateResponse.Errors.Add(exc.Message);
+#endif
+                projectUpdateResponse.Errors.Add("Erro ao alterar projeto.");
+
+                return projectUpdateResponse;
+            }
+        }
     }
 }

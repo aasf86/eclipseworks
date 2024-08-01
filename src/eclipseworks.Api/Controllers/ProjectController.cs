@@ -67,7 +67,12 @@ namespace eclipseworks.Api.Controllers
             var projectGet = new ProjectGet { Id = id.ToString() };
             var result = ProjectUseCase.Validate(projectGet);
 
-            if (!result.IsSuccess) return BadRequest(result);
+            if (!result.IsSuccess) return BadRequest(ResponseBase.New(
+                    projectGet, 
+                    Guid.NewGuid(), 
+                    result.Validation.Select(x => x.ErrorMessage).ToList()
+                )
+            );
 
             var projectGetRequest = RequestBase.New(projectGet, "host:api", "1.0");
             var projectGetResponse = await ProjectUseCase.GetById(projectGetRequest);
@@ -77,71 +82,65 @@ namespace eclipseworks.Api.Controllers
 
             return NotFound(projectGetResponse);
         }
-        /*                
-                /// <summary>
-                /// Obter uma projeto pela sua placa.
-                /// </summary>
-                /// <param name="plate"></param>
-                /// <returns></returns>
-                [HttpGet("{plate}")]
-                public async Task<IActionResult> GetByPlate(string plate)
-                {
-                    var ProjectGet = new ProjectGet { Plate = plate };
-                    var result = ProjectUseCase.Validate(ProjectGet);
 
-                    if (!result.IsSuccess) return BadRequest(result);
+        /// <summary>
+        /// Remove projeto pelo seu 'Id'.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var projectDelete = new ProjectDelete { Id = id.ToString() };
+            var result = ProjectUseCase.Validate(projectDelete);
 
-                    var ProjectGetRequest = RequestBase.New(ProjectGet, "host:api", "1.0");
-                    var ProjectGetResponse = await ProjectUseCase.GetByPlate(ProjectGetRequest);
+            if (!result.IsSuccess) return BadRequest(ResponseBase.New(
+                    projectDelete,
+                    Guid.NewGuid(),
+                    result.Validation.Select(x => x.ErrorMessage).ToList()
+                )
+            );
 
-                    if (ProjectGetResponse.IsSuccess && ProjectGetResponse.Data.Id > 0) 
-                        return Ok(ProjectGetResponse);
+            if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
 
-                    return NotFound(ProjectGetResponse);
-                }
+            projectDelete.SetUser(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
+#if DEBUG
+            projectDelete.SetUser("aasf86@gmail.com");
+#endif
+            var ProjectDeleteRequest = RequestBase.New(projectDelete, "host:api", "1.0");
+            var ProjectdeleteResponse = await ProjectUseCase.Delete(ProjectDeleteRequest);
 
-                /// <summary>
-                /// Atualizar a placa de uma projeto.
-                /// </summary>
-                /// <param name="Project"></param>
-                /// <returns></returns>
-                [HttpPut]
-                public async Task<IActionResult> Update([FromBody] ProjectUpdate Project)
-                {
-                    if (ModelState.IsValid)
-                    {
-                        var ProjectUpdateRequest = RequestBase.New(Project, "host:api", "1.0");
-                        var ProjectUpdateResponse = await ProjectUseCase.Update(ProjectUpdateRequest);
+            if (ProjectdeleteResponse.IsSuccess)
+                return Ok(ProjectdeleteResponse);
 
-                        if (ProjectUpdateResponse.IsSuccess)
-                            return Ok(ProjectUpdateResponse);
+            return BadRequest(ProjectdeleteResponse);
+        }
 
-                        return BadRequest(ProjectUpdateResponse);
-                    }
-                    return BadRequest();
-                }
+        /// <summary>
+        /// Atualizar o nome do projeto.
+        /// </summary>
+        /// <param name="projectUpdate"></param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] ProjectUpdate projectUpdate)
+        {
+            if (ModelState.IsValid)
+            {
+                if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
 
-                /// <summary>
-                /// Remove projeto pelo seu 'Id'.
-                /// </summary>
-                /// <param name="id"></param>
-                /// <returns></returns>
-                [HttpDelete("{id}")]
-                public async Task<IActionResult> Delete(int id)
-                {
-                    var ProjectDelete = new ProjectDelete { Id = id };
-                    var result = ProjectUseCase.Validate(ProjectDelete);
+                projectUpdate.SetUser(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
+#if DEBUG
+                projectUpdate.SetUser("aasf86@gmail.com");
+#endif
+                var projectUpdateRequest = RequestBase.New(projectUpdate, "host:api", "1.0");
+                var motorcycleUpdateResponse = await ProjectUseCase.Update(projectUpdateRequest);
 
-                    if (!result.IsSuccess) return BadRequest(result);
+                if (motorcycleUpdateResponse.IsSuccess)
+                    return Ok(motorcycleUpdateResponse);
 
-                    var ProjectDeleteRequest = RequestBase.New(ProjectDelete, "host:api", "1.0");
-                    var ProjectdeleteResponse = await ProjectUseCase.Delete(ProjectDeleteRequest);
-
-                    if (ProjectdeleteResponse.IsSuccess)
-                        return Ok(ProjectdeleteResponse);
-
-                    return BadRequest(ProjectdeleteResponse);
-                }     
-        */
+                return BadRequest(motorcycleUpdateResponse);
+            }
+            return BadRequest();
+        }
     }
 }

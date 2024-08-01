@@ -3,21 +3,25 @@ using static eclipseworks.Domain.Entities.Project;
 
 namespace eclipseworks.Business.Dtos.Project
 {
-    public class ProjectUpdate
+    public class ProjectUpdate : IValidatableObject
     {
-        /*
-        [Range(ProjectRule.YearMinimalValue, int.MaxValue, ErrorMessage = ProjectMsgDialog.InvalidYear)]
-        public int Year { get; set; }
+        [MinLength(ProjectRule.IdValueMinimalLenth, ErrorMessage = ProjectMsgDialog.InvalidId)]
+        [Required(ErrorMessage = ProjectMsgDialog.InvalidId)]
+        public string Id { get; set; }
 
-        [MinLength(ProjectRule.ModelMinimalLenth, ErrorMessage = ProjectMsgDialog.RequiredModel)]
-        [Required(ErrorMessage = ProjectMsgDialog.RequiredModel)]
-        [MaxLength(100, ErrorMessage = ProjectMsgDialog.InvalidModel )]
-        public string Model { get; set; } = "";
+        [MinLength(ProjectRule.NameMinimalLenth, ErrorMessage = ProjectMsgDialog.InvalidName)]
+        [Required(ErrorMessage = ProjectMsgDialog.RequiredName)]
+        [MaxLength(ProjectRule.NameMaxLenth, ErrorMessage = ProjectMsgDialog.InvalidName)]
+        public string Name { get; set; } = "";
 
-        [MinLength(ProjectRule.PlateMinimalLenth, ErrorMessage = ProjectMsgDialog.InvalidPlate)]
-        [Required(ErrorMessage = ProjectMsgDialog.RequiredPlate)]
-        [MaxLength(ProjectRule.PlateMaxLenth, ErrorMessage = ProjectMsgDialog.InvalidPlate)]
-        public string Plate { get; set; } = "";
-        */
+        public string User { get; private set; } = "";
+
+        public void SetUser(string user) => User = user;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrWhiteSpace(Id) || !long.TryParse(Id, out var idOut) || idOut <= 0)
+                yield return new ValidationResult(ProjectMsgDialog.InvalidId, ["Id"]);
+        }
     }
 }
