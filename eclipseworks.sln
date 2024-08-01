@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.10.35013.160
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32126.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eclipseworks.Api", "src\eclipseworks.Api\eclipseworks.Api.csproj", "{067FD420-522B-4B75-AB19-0863FC68036F}"
 EndProject
@@ -9,18 +9,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B97C00C0-126
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0D3686F9-092C-4770-9779-B085594FA8B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eclipseworks.Test", "src\eclipseworks.Test\eclipseworks.Test.csproj", "{4B11A6E1-7E0C-4A80-A96B-5189BA332361}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eclipseworks.Domain", "src\eclipseworks.Domain\eclipseworks.Domain.csproj", "{63B5C5FA-D9EA-4040-9E36-740D28828736}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eclipseworks.Domain", "src\eclipseworks.Domain\eclipseworks.Domain.csproj", "{63B5C5FA-D9EA-4040-9E36-740D28828736}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eclipseworks.Business", "src\eclipseworks.Business\eclipseworks.Business.csproj", "{B39D3F3B-01B6-447E-BDF0-C70F7DF5B885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eclipseworks.Business", "src\eclipseworks.Business\eclipseworks.Business.csproj", "{B39D3F3B-01B6-447E-BDF0-C70F7DF5B885}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eclipseworks.Infrastructure", "src\eclipseworks.Infrastructure\eclipseworks.Infrastructure.csproj", "{9F5424F8-FF39-431F-8222-F503C72FE674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eclipseworks.Infrastructure", "src\eclipseworks.Infrastructure\eclipseworks.Infrastructure.csproj", "{9F5424F8-FF39-431F-8222-F503C72FE674}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{58949EEE-A296-4771-8F35-7017BC853B01}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eclipseworks.Test", "test\eclipseworks.Test\eclipseworks.Test.csproj", "{60692CC5-C3C7-458B-ABF3-BC403138FA32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,10 +32,6 @@ Global
 		{067FD420-522B-4B75-AB19-0863FC68036F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{067FD420-522B-4B75-AB19-0863FC68036F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{067FD420-522B-4B75-AB19-0863FC68036F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B11A6E1-7E0C-4A80-A96B-5189BA332361}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B11A6E1-7E0C-4A80-A96B-5189BA332361}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B11A6E1-7E0C-4A80-A96B-5189BA332361}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B11A6E1-7E0C-4A80-A96B-5189BA332361}.Release|Any CPU.Build.0 = Release|Any CPU
 		{63B5C5FA-D9EA-4040-9E36-740D28828736}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{63B5C5FA-D9EA-4040-9E36-740D28828736}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63B5C5FA-D9EA-4040-9E36-740D28828736}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -48,16 +44,20 @@ Global
 		{9F5424F8-FF39-431F-8222-F503C72FE674}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F5424F8-FF39-431F-8222-F503C72FE674}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F5424F8-FF39-431F-8222-F503C72FE674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60692CC5-C3C7-458B-ABF3-BC403138FA32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60692CC5-C3C7-458B-ABF3-BC403138FA32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60692CC5-C3C7-458B-ABF3-BC403138FA32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60692CC5-C3C7-458B-ABF3-BC403138FA32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{067FD420-522B-4B75-AB19-0863FC68036F} = {B97C00C0-126F-45AA-BB20-65839825617D}
-		{4B11A6E1-7E0C-4A80-A96B-5189BA332361} = {0D3686F9-092C-4770-9779-B085594FA8B2}
 		{63B5C5FA-D9EA-4040-9E36-740D28828736} = {B97C00C0-126F-45AA-BB20-65839825617D}
 		{B39D3F3B-01B6-447E-BDF0-C70F7DF5B885} = {B97C00C0-126F-45AA-BB20-65839825617D}
 		{9F5424F8-FF39-431F-8222-F503C72FE674} = {B97C00C0-126F-45AA-BB20-65839825617D}
+		{60692CC5-C3C7-458B-ABF3-BC403138FA32} = {0D3686F9-092C-4770-9779-B085594FA8B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A7AB6CC-A50B-4197-8E2A-C5F04A830A11}
