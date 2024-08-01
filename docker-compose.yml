@@ -1,0 +1,41 @@
+
+services:
+  eclipseworksapi: #Api
+    image: ${DOCKER_REGISTRY-}eclipseworksapi
+    build:
+      context: .
+      dockerfile: src/eclipseworks.Api/Dockerfile
+    ports: 
+     - "8081:8080"
+
+    depends_on:
+     - postgres-ew
+
+    networks:
+     neteclipseworks:
+
+#<postgres>
+  postgres-ew:
+    container_name: postgres-ew
+    image: postgres
+    ports: 
+     - "5432:5432"
+    environment:
+     POSTGRES_PASSWORD: postgres
+     POSTGRES_USER: postgres
+     POSTGRES_DB: eclipseworksdb
+     PGPORT: 5432
+    volumes:
+     #- pgdata-eclipseworksdb:/var/lib/postgresql/data
+     - ./src/eclipseworks.Infrastructure/ChangesDB/1.0.0/01_DDL.sql:/docker-entrypoint-initdb.d/01_DDL.sql
+     - ./src/eclipseworks.Infrastructure/ChangesDB/1.0.0/02_DML.sql:/docker-entrypoint-initdb.d/02_DML.sql
+    networks:
+     neteclipseworks:
+#</postgres>
+
+#volumes:
+  #pgdata-eclipseworksdb: {}
+
+networks:
+  neteclipseworks:
+    
