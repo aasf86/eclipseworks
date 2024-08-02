@@ -4,6 +4,7 @@ using eclipseworks.Business.Dtos.Project;
 using eclipseworks.Domain.Contracts.Repositories.Project;
 using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Data;
 using static eclipseworks.Domain.Entities.Project;
 
@@ -227,6 +228,42 @@ namespace eclipseworks.Business.UseCases.Project
                 projectUpdateResponse.Errors.Add("Erro ao alterar projeto.");
 
                 return projectUpdateResponse;
+            }
+        }
+
+        public async Task<ResponseBase<List<ProjectGet>>> GetAll(RequestBase<string> projectGetRequest)
+        {
+            try
+            {
+                var projectGetResponse = ResponseBase.New(new List<ProjectGet>(), projectGetRequest.RequestId);
+
+                await UnitOfWorkExecute(async () =>
+                {
+                    var listProjects = await ProjectRepository.GetAll(projectGetRequest.Data);
+
+                    projectGetResponse.Data = listProjects.Select(x => new ProjectGet
+                    {
+                        Id = x.Id.ToString(),
+                        Name = x.Name,
+                        UserOwner = x.UserOwner
+                    }).ToList();
+
+                });
+
+                return projectGetResponse;
+            }
+            catch (Exception exc)
+            {
+                "Erro no [GetAll] projetos: {ProjectName}".LogErr(projectGetRequest.Data);
+                exc.Message.LogErr(exc);
+
+                var projectGetResponse = ResponseBase.New(new List<ProjectGet>(), projectGetRequest.RequestId);
+#if DEBUG
+                projectGetResponse.Errors.Add(exc.Message);
+#endif
+                projectGetResponse.Errors.Add("Erro ao obter projetos");
+
+                return projectGetResponse;
             }
         }
     }

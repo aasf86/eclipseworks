@@ -1,6 +1,7 @@
 //using eclipseworks.Business.Config;
 using eclipseworks.Infrastructure.Config;
 using eclipseworks.Business.Config;
+using eclipseworks.Api.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen_eclipseworks();
 
 //Injeção de dependências do eclipsworks
 builder.Services.AddBusinessIoC();

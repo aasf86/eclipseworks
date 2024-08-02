@@ -142,5 +142,22 @@ namespace eclipseworks.Api.Controllers
             }
             return BadRequest();
         }
+
+        /// <summary>
+        /// Procura projetos pelo 'nome'.
+        /// </summary>
+        /// <param name="name">Para buscar todos insira '%'</param>
+        /// <returns></returns>
+        [HttpGet("all/{name}")]
+        public async Task<IActionResult> GetAll(string? name = null)
+        {
+            var projectGetAllRequest = RequestBase.New(name, "host:api", "1.0");
+            var projectGetResponse = await ProjectUseCase.GetAll(projectGetAllRequest);
+
+            if (projectGetResponse.IsSuccess)
+                return Ok(projectGetResponse);
+
+            return BadRequest(projectGetResponse);
+        }
     }
 }

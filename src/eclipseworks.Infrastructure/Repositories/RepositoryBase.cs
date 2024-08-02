@@ -39,7 +39,8 @@ namespace eclipseworks.Infrastructure.Repositories
 
         public virtual async Task<List<TEntity?>> GetAll(dynamic filter)
         {
-            return default;            
+            //implementar filter, no futuro, pois até o momento não é necessário            
+            return (await DbTransaction.Connection.QueryAsync<TEntity?>(SqlSelect, new { filter })).ToList();
         }
 
         public virtual async Task<TEntity?> GetById(long id)
