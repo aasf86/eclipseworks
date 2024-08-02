@@ -16,16 +16,16 @@ namespace eclipseworks.Api.Controllers
     [ApiController]
     public class ProjectController : ControllerBase
     {
-        private readonly IProjectUseCase _ProjectUseCase;
-        private IProjectUseCase ProjectUseCase => _ProjectUseCase;
+        private readonly IProjectUseCase _projectUseCase;
+        private IProjectUseCase ProjectUseCase => _projectUseCase;
 
         /// <summary>
         /// Controller para gestão de cadastros de projetos.
         /// </summary>
-        /// <param name="ProjectUseCase"></param>
-        public ProjectController(IProjectUseCase ProjectUseCase)
+        /// <param name="projectUseCase"></param>
+        public ProjectController(IProjectUseCase projectUseCase)
         {
-            _ProjectUseCase = ProjectUseCase;
+            _projectUseCase = projectUseCase;
         }
         
         /// <summary>
