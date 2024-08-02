@@ -22,6 +22,7 @@ create table if not exists project
 create table if not exists events.project
 (
 	Id bigserial not null primary key,
+    ProjectId bigint not null,
     TransactionId uuid DEFAULT gen_random_uuid(), 
     Inserted timestamp without time zone NOT NULL DEFAULT now(),
     EventUser varchar(100),
@@ -35,6 +36,7 @@ declare rowRecord record;
 declare objectJson json;
 declare objectJsonOld json;
 begin
+
 	case
 		when tg_op = 'DELETE' then 
 			rowRecord := old;
@@ -54,8 +56,8 @@ begin
 
     end if;
     
-    insert into events.project (EventUser, Event, Object) 
-    values (rowRecord.LastEventByUser, tg_op, objectJson);
+    insert into events.project (ProjectId, EventUser, Event, Object) 
+    values (rowRecord.Id, rowRecord.LastEventByUser, tg_op, objectJson);
 	
 	return rowRecord;
 end;
