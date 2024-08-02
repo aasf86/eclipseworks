@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using eclipseworks.Business.Dtos.Project;
+using System.ComponentModel.DataAnnotations;
 using static eclipseworks.Domain.Entities.Project;
 
 namespace eclipseworks.Business.Dtos.Project
@@ -9,9 +10,14 @@ namespace eclipseworks.Business.Dtos.Project
         [Required(ErrorMessage = ProjectMsgDialog.InvalidId)]
         public string Id { get; set; }
 
-        public string User { get; private set; } = "";
+        [Required(ErrorMessage = ProjectMsgDialog.RequiredUserEvent)]
+        public string UserEvent { get; private set; } = "";
 
-        public void SetUser(string user) => User = user;
+        public ProjectDelete SetUserEvent(string userEvent)
+        {
+            UserEvent = userEvent;
+            return this;
+        }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

@@ -92,6 +92,10 @@ namespace eclipseworks.Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var projectDelete = new ProjectDelete { Id = id.ToString() };
+            projectDelete.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
+#if DEBUG
+            projectDelete.SetUserEvent("aasf86@gmail.com");
+#endif
             var result = ProjectUseCase.Validate(projectDelete);
 
             if (!result.IsSuccess) return BadRequest(ResponseBase.New(
@@ -103,10 +107,6 @@ namespace eclipseworks.Api.Controllers
 
             if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
 
-            projectDelete.SetUser(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
-#if DEBUG
-            projectDelete.SetUser("aasf86@gmail.com");
-#endif
             var ProjectDeleteRequest = RequestBase.New(projectDelete, "host:api", "1.0");
             var ProjectdeleteResponse = await ProjectUseCase.Delete(ProjectDeleteRequest);
 
@@ -128,17 +128,17 @@ namespace eclipseworks.Api.Controllers
             {
                 if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
 
-                projectUpdate.SetUser(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
+                projectUpdate.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
 #if DEBUG
-                projectUpdate.SetUser("aasf86@gmail.com");
+                projectUpdate.SetUserEvent("aasf86@gmail.com");
 #endif
                 var projectUpdateRequest = RequestBase.New(projectUpdate, "host:api", "1.0");
-                var motorcycleUpdateResponse = await ProjectUseCase.Update(projectUpdateRequest);
+                var projectUpdateResponse = await ProjectUseCase.Update(projectUpdateRequest);
 
-                if (motorcycleUpdateResponse.IsSuccess)
-                    return Ok(motorcycleUpdateResponse);
+                if (projectUpdateResponse.IsSuccess)
+                    return Ok(projectUpdateResponse);
 
-                return BadRequest(motorcycleUpdateResponse);
+                return BadRequest(projectUpdateResponse);
             }
             return BadRequest();
         }

@@ -14,9 +14,13 @@ namespace eclipseworks.Business.Dtos.Project
         [MaxLength(ProjectRule.NameMaxLenth, ErrorMessage = ProjectMsgDialog.InvalidName)]
         public string Name { get; set; } = "";
 
-        public string User { get; private set; } = "";
+        public string UserEvent { get; private set; } = "";
 
-        public void SetUser(string user) => User = user;
+        public ProjectUpdate SetUserEvent(string userEvent)
+        {
+            UserEvent = userEvent;
+            return this;
+        }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

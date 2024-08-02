@@ -88,9 +88,7 @@ namespace eclipseworks.Business.UseCases.Project
 
                 if (!result.IsSuccess)
                 {
-                    projectGetResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
-                    var errors = string.Join("\n", projectGetResponse.Errors.ToArray());
-                    $"Projeto inválido '{{ProjectId}}': {errors} ".LogWrn(projectGet.Id);
+                    projectGetResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());                    
                     return projectGetResponse;
                 }
 
@@ -141,7 +139,7 @@ namespace eclipseworks.Business.UseCases.Project
 
                 if (!result.IsSuccess)
                 {
-                    projectDeleteResponse.Errors.Add(ProjectMsgDialog.InvalidId);
+                    projectDeleteResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());                    
                     return projectDeleteResponse;
                 }
 
@@ -155,7 +153,7 @@ namespace eclipseworks.Business.UseCases.Project
                         return;
                     }
 
-                    projectFromDb.SetLastEventByUser(projectDelete.User);
+                    projectFromDb.SetLastEventByUser(projectDelete.UserEvent);
 
                     await ProjectRepository.Update(projectFromDb);
 
@@ -173,7 +171,7 @@ namespace eclipseworks.Business.UseCases.Project
 #if DEBUG
                 projectDeleteResponse.Errors.Add(exc.Message);
 #endif
-                projectDeleteResponse.Errors.Add("Erro ao excluir motocicleta.");
+                projectDeleteResponse.Errors.Add("Erro ao excluir projeto.");
 
                 return projectDeleteResponse;
             }
@@ -209,7 +207,7 @@ namespace eclipseworks.Business.UseCases.Project
                     }
 
                     projectFromDb.SetName(projectUpdate.Name);
-                    projectFromDb.SetLastEventByUser(projectUpdate.User);                    
+                    projectFromDb.SetLastEventByUser(projectUpdate.UserEvent);                    
 
                     await ProjectRepository.Update(projectFromDb);
                 });

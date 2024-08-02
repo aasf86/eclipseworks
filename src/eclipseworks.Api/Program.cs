@@ -1,4 +1,3 @@
-//using eclipseworks.Business.Config;
 using eclipseworks.Infrastructure.Config;
 using eclipseworks.Business.Config;
 using eclipseworks.Api.Config;

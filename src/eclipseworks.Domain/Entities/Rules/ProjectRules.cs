@@ -16,6 +16,7 @@
             public const string RequiredUserOwner = "Informe o usuário do projeto.";
             public const string InvalidId = "Informe id do projeto.";
             public const string NotFound = "Projeto não encontrado.";
+            public const string RequiredUserEvent = "Informe o usuário para esta ação.";
         }
     }
 }

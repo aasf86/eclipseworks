@@ -14,7 +14,11 @@ namespace eclipseworks.Business.Dtos.Project
 
         public string UserOwner { get; private set; } = "";
 
-        public void SetUserOwner(string userOwner) => UserOwner = userOwner;
+        public ProjectInsert SetUserOwner(string userOwner)
+        {
+            UserOwner = userOwner;
+            return this;
+        }
         public void SetId(string id) => Id = id;
     }
 }
