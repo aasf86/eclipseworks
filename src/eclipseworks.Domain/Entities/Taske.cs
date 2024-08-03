@@ -18,12 +18,10 @@ namespace eclipseworks.Domain.Entities
             .SetTitle(title)
             .SetDescription(description)
             .SetExpires(expires)
-            .SetStatus(status);
+            .SetStatus(status)
+            .SetPriority(priority);            
 
-            if (priority is null || priority == ePriority.Nulo) throw new InvalidDataException(TaskeMsgDialog.RequiredPriority);
-
-            ProjectId = projectId;
-            Priority = priority.Value;
+            ProjectId = projectId;            
         }
 
         public long ProjectId { get; private set; }
@@ -61,6 +59,15 @@ namespace eclipseworks.Domain.Entities
             Status = status.Value;
             ToUpdate();
             return this;
-        }        
+        }
+
+        public Taske SetPriority(ePriority? priority)
+        {
+            if(Priority != ePriority.Nulo) throw new InvalidDataException(TaskeMsgDialog.NotAllowedChangePriority);
+            if (priority is null || priority == ePriority.Nulo) throw new InvalidDataException(TaskeMsgDialog.RequiredPriority);
+            Priority = priority.Value;
+            ToUpdate();
+            return this;
+        }
     }
 }

@@ -8,7 +8,7 @@ using Moq;
 using System.Data;
 using static eclipseworks.Domain.Entities.Project;
 
-namespace eclipseworks.Test.Unit
+namespace eclipseworks.Test.Unit.Project
 {
     public class UnitTestProjectUseCase
     {
@@ -264,7 +264,7 @@ namespace eclipseworks.Test.Unit
 
         #region [Get]
 
-        [Fact(DisplayName ="[Get] Encontrar projeto com sucesso")]
+        [Fact(DisplayName = "[Get] Encontrar projeto com sucesso")]
         public async Task Found_Item_With_Success()
         {
             Setup();
@@ -286,7 +286,7 @@ namespace eclipseworks.Test.Unit
             var projectGetRequest = RequestBase.New(projectGet);
             var projectGetResponse = await _projectUseCase.GetById(projectGetRequest);
 
-            Assert.False(projectGetResponse.IsSuccess);            
+            Assert.False(projectGetResponse.IsSuccess);
             Assert.Contains(ProjectMsgDialog.InvalidId, projectGetResponse.Errors);
         }
 

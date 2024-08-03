@@ -29,6 +29,9 @@
             public const string RequiredProjectId = "Informe o projeto da tarefa.";
             public const string InvalidProjectId = "Informe o projeto válido.";
             public const string RequiredUser = "Informe o usuário da tarefa.";
+            public const string NotFound = "Tarefa não encontada.";
+            public const string NotAllowedChangePriority = "Não é permitido alterar prioridade.";
+            
         }
 
         public enum eStatus

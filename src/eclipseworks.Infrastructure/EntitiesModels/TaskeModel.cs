@@ -1,6 +1,7 @@
 ﻿using eclipseworks.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static eclipseworks.Domain.Entities.Taske;
 
 namespace eclipseworks.Infrastructure.EntitiesModels
 {
@@ -30,18 +31,16 @@ namespace eclipseworks.Infrastructure.EntitiesModels
         public new long Id { get; set; }
 
         [NotMapped]
-        public new eStatus Status { get { return base.Status; } }
+        public new eStatus Status { get { return base.Status; } set { SetStatus(value); } }
 
         [NotMapped]
-        public new ePriority Priority { get { return base.Priority; } }
+        public new ePriority Priority { get { return base.Priority; } set { SetPriority(value); } }
 
         [NotMapped]
         public new Project Project { get { return base.Project; } }
 
-        public int StatusId { get { return (int)base.Status; } }
+        public int StatusId { get { return (int)Status; } }
 
-        public int PriorityId { get { return (int)base.Priority; } }
-
-
+        public int PriorityId { get { return (int)Priority; } }
     }
 }

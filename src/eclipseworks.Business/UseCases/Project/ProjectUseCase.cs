@@ -28,8 +28,6 @@ namespace eclipseworks.Business.UseCases.Project
         {
             try
             {
-                "Iniciando [Insert] do projeto: {Projeto}".LogInf(projectInsertRequest.Data.Name);
-
                 var projectInsert = projectInsertRequest.Data;
                 var projectInsertResponse = ResponseBase.New(projectInsert, projectInsertRequest.RequestId);
                 var result = Validate(projectInsert);
@@ -37,8 +35,7 @@ namespace eclipseworks.Business.UseCases.Project
                 if (!result.IsSuccess)
                 {
                     projectInsertResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
-                    var errors = string.Join("\n", projectInsertResponse.Errors.ToArray());
-                    $"Projeto inválido '{{Projeto}}': {errors} ".LogWrn(projectInsert.Name);                    
+                    var errors = string.Join("\n", projectInsertResponse.Errors.ToArray());                    
                     return projectInsertResponse;
                 }
 
@@ -80,8 +77,6 @@ namespace eclipseworks.Business.UseCases.Project
         {
             try
             {
-                "Iniciando [Get] do projeto: {ProjectId}".LogInf(projectGetRequest.Data.Id);
-
                 var projectGet = projectGetRequest.Data;
                 var projectGetResponse = ResponseBase.New(projectGetRequest.Data, projectGetRequest.RequestId);
                 var result = Validate(projectGet);
@@ -131,8 +126,6 @@ namespace eclipseworks.Business.UseCases.Project
         {
             try
             {
-                "Iniciando [Delete] do projeto: {ProjectId}".LogInf(projectDeleteRequest.Data.Id);
-
                 var projectDelete = projectDeleteRequest.Data;
                 var projectDeleteResponse = ResponseBase.New(projectDelete, projectDeleteRequest.RequestId);
                 var result = Validate(projectDelete);
