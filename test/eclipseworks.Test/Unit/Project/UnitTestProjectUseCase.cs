@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System.Data;
 using static eclipseworks.Domain.Entities.Project;
+using static eclipseworks.Domain.Entities.Rules.GeneralRules;
 
 namespace eclipseworks.Test.Unit.Project
 {
@@ -242,7 +243,7 @@ namespace eclipseworks.Test.Unit.Project
             var projectUpdateResponse = await _projectUseCase.Delete(projectDeleteRequest);
 
             Assert.False(projectUpdateResponse.IsSuccess);
-            Assert.Contains(ProjectMsgDialog.RequiredUserEvent, projectUpdateResponse.Errors);
+            Assert.Contains(MsgDialog.RequiredUserEvent, projectUpdateResponse.Errors);
         }
 
         [Fact(DisplayName = "[Delete] Quando não encontrar projeto, retornar como erro")]

@@ -1,4 +1,6 @@
-﻿namespace eclipseworks.Domain.Entities
+﻿using System.Runtime.ConstrainedExecution;
+
+namespace eclipseworks.Domain.Entities
 {
     public partial class Taske
     {
@@ -11,6 +13,9 @@
 
             public const int DescriptionMinimalLenth = 3;
             public const int DescriptionMaxLenth = 250;
+
+            public const int MaximumNumberTaskesPerProject = 20;
+
             /*
             public const int IdValueMinimalLenth = 1;
             public const int NameMinimalLenth = 3;

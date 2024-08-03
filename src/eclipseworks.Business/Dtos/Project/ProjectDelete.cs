@@ -1,6 +1,7 @@
 ﻿using eclipseworks.Business.Dtos.Project;
 using System.ComponentModel.DataAnnotations;
 using static eclipseworks.Domain.Entities.Project;
+using static eclipseworks.Domain.Entities.Rules.GeneralRules;
 
 namespace eclipseworks.Business.Dtos.Project
 {
@@ -10,7 +11,7 @@ namespace eclipseworks.Business.Dtos.Project
         [Required(ErrorMessage = ProjectMsgDialog.InvalidId)]
         public string Id { get; set; }
 
-        [Required(ErrorMessage = ProjectMsgDialog.RequiredUserEvent)]
+        [Required(ErrorMessage = MsgDialog.RequiredUserEvent)]
         public string UserEvent { get; private set; } = "";
 
         public ProjectDelete SetUserEvent(string userEvent)

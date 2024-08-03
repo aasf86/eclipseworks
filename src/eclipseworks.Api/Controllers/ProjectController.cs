@@ -38,8 +38,6 @@ namespace eclipseworks.Api.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
-
                 projectInsert.SetUserOwner(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
 //#if DEBUG
                 projectInsert.SetUserOwner("aasf86@gmail.com");
@@ -105,8 +103,6 @@ namespace eclipseworks.Api.Controllers
                 )
             );
 
-            if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
-
             var ProjectDeleteRequest = RequestBase.New(projectDelete, "host:api", "1.0");
             var ProjectdeleteResponse = await ProjectUseCase.Delete(ProjectDeleteRequest);
 
@@ -126,8 +122,6 @@ namespace eclipseworks.Api.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
-
                 projectUpdate.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
 //#if DEBUG
                 projectUpdate.SetUserEvent("aasf86@gmail.com");
@@ -151,6 +145,8 @@ namespace eclipseworks.Api.Controllers
         [HttpGet("all/{name}")]
         public async Task<IActionResult> GetAll(string? name = null)
         {
+            if (string.IsNullOrWhiteSpace(name)) return BadRequest(ResponseBase.New(new List<ProjectGet>(), Guid.NewGuid()));
+
             var projectGetAllRequest = RequestBase.New(name, "host:api", "1.0");
             var projectGetResponse = await ProjectUseCase.GetAll(projectGetAllRequest);
 

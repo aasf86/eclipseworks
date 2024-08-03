@@ -1,8 +1,6 @@
 ﻿using eclipseworks.Business.Contracts.UseCases.Taske;
 using eclipseworks.Business.Dtos;
 using eclipseworks.Business.Dtos.Taske;
-using eclipseworks.Business.Dtos.Taske;
-using eclipseworks.Business.UseCases.Taske;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -40,8 +38,6 @@ namespace eclipseworks.Api.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
-
                 taskeInsert.SetUserOwner(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
 //#if DEBUG
                 taskeInsert.SetUserOwner("aasf86@gmail.com");
@@ -87,8 +83,6 @@ namespace eclipseworks.Api.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
-
                 taskeUpdate.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
 //#if DEBUG
                 taskeUpdate.SetUserEvent("aasf86@gmail.com");
@@ -102,6 +96,56 @@ namespace eclipseworks.Api.Controllers
                 return BadRequest(taskeUpdateResponse);
             }
             return BadRequest();
+        }
+
+        /// <summary>
+        /// Remove tarefa pelo seu 'Id'.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var taskeDelete = new TaskeDelete { Id = id.ToString() };
+            taskeDelete.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
+//#if DEBUG
+            taskeDelete.SetUserEvent("aasf86@gmail.com");
+//#endif
+            var result = TaskeUseCase.Validate(taskeDelete);
+
+            if (!result.IsSuccess) return BadRequest(ResponseBase.New(
+                    taskeDelete,
+                    Guid.NewGuid(),
+                    result.Validation.Select(x => x.ErrorMessage).ToList()
+                )
+            );
+
+            var TaskeDeleteRequest = RequestBase.New(taskeDelete, "host:api", "1.0");
+            var TaskedeleteResponse = await TaskeUseCase.Delete(TaskeDeleteRequest);
+
+            if (TaskedeleteResponse.IsSuccess)
+                return Ok(TaskedeleteResponse);
+
+            return BadRequest(TaskedeleteResponse);
+        }
+
+        /// <summary>
+        /// Procura tarefas pelo 'título e descrição'.
+        /// </summary>
+        /// <param name="name">Para buscar todos insira '%'</param>
+        /// <returns></returns>
+        [HttpGet("all/{name}")]
+        public async Task<IActionResult> GetAll(string? name = null)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return BadRequest(ResponseBase.New(new List<TaskeGet>(), Guid.NewGuid()));
+
+            var taskeGetAllRequest = RequestBase.New(name, "host:api", "1.0");
+            var taskeGetResponse = await TaskeUseCase.GetAll(taskeGetAllRequest);
+
+            if (taskeGetResponse.IsSuccess)
+                return Ok(taskeGetResponse);
+
+            return BadRequest(taskeGetResponse);
         }
     }
 }
