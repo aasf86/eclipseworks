@@ -1,12 +1,11 @@
 ﻿using eclipseworks.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Entity = eclipseworks.Domain.Entities;
 
 namespace eclipseworks.Infrastructure.EntitiesModels
 {
     [Table("taske")]
-    public class TaskeModel : Entity.Taske
+    public class TaskeModel : Taske
     {
         public TaskeModel() { }
         public TaskeModel(
