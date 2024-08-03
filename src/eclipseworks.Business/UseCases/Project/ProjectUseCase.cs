@@ -4,9 +4,12 @@ using eclipseworks.Business.Dtos.Project;
 using eclipseworks.Domain.Contracts.Repositories.Project;
 using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using static eclipseworks.Domain.Entities.Project;
+using static eclipseworks.Infrastructure.Repositories.DocPostgresql;
 
 namespace eclipseworks.Business.UseCases.Project
 {
@@ -155,6 +158,32 @@ namespace eclipseworks.Business.UseCases.Project
 
                 return projectDeleteResponse;
             }
+            catch (PostgresException exc)
+            {
+                "Erro [Delete] projeto: {ProjectId}".LogErr(projectDeleteRequest.Data.Id);
+                exc.Message.LogErr(exc);
+
+                var projectDeleteResponse = ResponseBase.New(projectDeleteRequest.Data, projectDeleteRequest.RequestId);                
+#if DEBUG
+                projectDeleteResponse.Errors.Add(exc.Message);
+#endif
+                if (exc.SqlState.Equals(CodeErrors.FOREIGN_KEY_VIOLATION))
+                {
+                    var flag = typeof(TaskeModel)
+                       .GetCustomAttributes(true)
+                       .Where(x => x is TableAttribute)
+                       .Where(x => (x as TableAttribute).Name.Equals(exc.TableName))
+                       .Any();
+
+                    if (flag) projectDeleteResponse.Errors.Add("Erro ao excluir projeto pois encontra-se associado a tarefas.");
+
+                    return projectDeleteResponse;
+                }
+
+                projectDeleteResponse.Errors.Add("Erro ao excluir projeto.");
+
+                return projectDeleteResponse;
+            }
             catch (Exception exc)
             {
                 "Erro [Delete] projeto: {ProjectId}".LogErr(projectDeleteRequest.Data.Id);
@@ -168,6 +197,7 @@ namespace eclipseworks.Business.UseCases.Project
 
                 return projectDeleteResponse;
             }
+            
         }
 
         public async Task<ResponseBase<ProjectUpdate>> Update(RequestBase<ProjectUpdate> projectUpdateRequest)
