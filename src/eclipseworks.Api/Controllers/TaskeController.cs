@@ -29,7 +29,7 @@ namespace eclipseworks.Api.Controllers
         }
         
         /// <summary>
-        /// Inserir novo projeto.
+        /// Inserir nova tarefa.
         /// </summary>
         /// <param name="taskeInsert"></param>
         /// <returns></returns>
@@ -57,7 +57,7 @@ namespace eclipseworks.Api.Controllers
         }
 /*
         /// <summary>
-        /// Obter um projeto pelo 'Id'.
+        /// Obter um tarefa pelo 'Id'.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -84,7 +84,7 @@ namespace eclipseworks.Api.Controllers
         }
 
         /// <summary>
-        /// Remove projeto pelo seu 'Id'.
+        /// Remove tarefa pelo seu 'Id'.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
