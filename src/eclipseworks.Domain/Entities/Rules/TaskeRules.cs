@@ -38,6 +38,7 @@ namespace eclipseworks.Domain.Entities
             public const string NotFound = "Tarefa não encontada.";
             public const string NotAllowedChangePriority = "Não é permitido alterar prioridade.";
             public const string InvalidId = "Informe id da tarefa.";
+            public const string LimitReached = "Limite de tarefas atingido para o projeto. Quantidade permitida: {0}.";
 
         }
 

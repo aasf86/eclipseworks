@@ -5,8 +5,6 @@ using eclipseworks.Domain.Contracts.Repositories.Project;
 using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using static eclipseworks.Domain.Entities.Project;
 using static eclipseworks.Infrastructure.Repositories.DocPostgresql;
@@ -167,16 +165,13 @@ namespace eclipseworks.Business.UseCases.Project
 #if DEBUG
                 projectDeleteResponse.Errors.Add(exc.Message);
 #endif
-                if (exc.SqlState.Equals(CodeErrors.FOREIGN_KEY_VIOLATION))
+                if (
+                    exc.SqlState.Equals(CodeErrors.FOREIGN_KEY_VIOLATION, StringComparison.OrdinalIgnoreCase) 
+                    && 
+                    exc.TableName.Equals(TaskeModel.TableName, StringComparison.OrdinalIgnoreCase)
+                   )
                 {
-                    var flag = typeof(TaskeModel)
-                       .GetCustomAttributes(true)
-                       .Where(x => x is TableAttribute)
-                       .Where(x => (x as TableAttribute).Name.Equals(exc.TableName))
-                       .Any();
-
-                    if (flag) projectDeleteResponse.Errors.Add("Erro ao excluir projeto pois encontra-se associado a tarefas.");
-
+                    projectDeleteResponse.Errors.Add("Erro ao excluir projeto pois encontra-se associado a tarefas.");
                     return projectDeleteResponse;
                 }
 

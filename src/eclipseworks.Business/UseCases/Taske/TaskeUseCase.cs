@@ -40,7 +40,7 @@ namespace eclipseworks.Business.UseCases.Taske
 
                 if (string.IsNullOrEmpty(taskeInsert.UserOwner))
                 {
-                    taskeInsertResponse.Errors.Add(TaskeMsgDialog.RequiredUser);                    
+                    taskeInsertResponse.Errors.Add(TaskeMsgDialog.RequiredUser);
                     return taskeInsertResponse;
                 }
 
@@ -55,11 +55,13 @@ namespace eclipseworks.Business.UseCases.Taske
 
                 await UnitOfWorkExecute(async () =>
                 {
-                    //var TaskeFromDb = await TaskeRepository.GetByPlate(taskeInsert.Plate);
-                    //aasf86 verificar no já cadastrado
-                    //aasf86 validar quantidade minima de 20 tarefas por projeto
-                    #warning >>>>>>>>>>>>>>>>>>validar quantidade minima de 20 tarefas por projeto<<<<<<<<<<<<<<<<<<
-                    var number = TaskeRule.MaximumNumberTaskesPerProject;
+                    var limitReached = await TaskeRepository.TaskeLimitReached(taskeEntity.ProjectId, TaskeRule.MaximumNumberTaskesPerProject);
+
+                    if (limitReached)
+                    {
+                        taskeInsertResponse.Errors.Add(string.Format(TaskeMsgDialog.LimitReached, TaskeRule.MaximumNumberTaskesPerProject));
+                        return;
+                    }
 
                     await TaskeRepository.Insert(taskeEntity);
                     taskeInsertResponse.Data = taskeEntity.Id;

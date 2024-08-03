@@ -1,13 +1,13 @@
 ﻿using eclipseworks.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static eclipseworks.Domain.Entities.Taske;
 
 namespace eclipseworks.Infrastructure.EntitiesModels
 {
-    [Table("taske")]
+    [Table(TableName)]
     public class TaskeModel : Taske
     {
+        public const string TableName = "taske";
         public TaskeModel() { }
         public TaskeModel(
             string userEvent,

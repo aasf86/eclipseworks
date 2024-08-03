@@ -44,5 +44,19 @@ namespace eclipseworks.Infrastructure.Repositories.Taske
 
             return (await DbTransaction.Connection.QueryAsync<TaskeModel?>(sql, new { filter })).ToList();
         }
+
+        public async Task<bool> TaskeLimitReached(long projetctId, int maxLimit)
+        {
+            var sql = $@"
+                select 
+                    count(0) 
+                from 
+                    {TaskeModel.TableName} t
+                where t.projectid = @projetctId";
+
+            var count = await DbTransaction.Connection.ExecuteScalarAsync<long>(sql, new { projetctId });
+
+            return count >= maxLimit;
+        }
     }
 }
