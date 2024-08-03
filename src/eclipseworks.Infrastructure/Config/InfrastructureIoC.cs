@@ -1,6 +1,8 @@
 ﻿using eclipseworks.Domain.Contracts.Repositories.Project;
+using eclipseworks.Domain.Contracts.Repositories.Taske;
 using eclipseworks.Infrastructure.EntitiesModels;
 using eclipseworks.Infrastructure.Repositories.Project;
+using eclipseworks.Infrastructure.Repositories.Taske;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -21,6 +23,7 @@ namespace eclipseworks.Infrastructure.Config
             });
 
             services.AddScoped<IProjectRepository<ProjectModel>, ProjectRepository>();
+            services.AddScoped<ITaskeRepository<TaskeModel>, TaskeRepository>();
 
             return services;
         }
