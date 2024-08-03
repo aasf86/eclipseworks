@@ -22,7 +22,8 @@ namespace eclipseworks.Infrastructure.EntitiesModels
                 expires,
                 status,
                 priority,
-                projectId) 
+                projectId,
+                userEvent) 
         {
             SetLastEventByUser(userEvent);            
         }

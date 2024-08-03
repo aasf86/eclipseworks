@@ -20,9 +20,8 @@ namespace eclipseworks.Test.Unit.Taske
                 DateTime.Now.AddDays(365), 
                 eStatus.Pending, 
                 ePriority.Low, 
-                1);
-
-            ;
+                1,
+                "eu@min.vc");
 
             Assert.Throws<InvalidDataException>(() => { taske.SetPriority(ePriority.High); });
         }

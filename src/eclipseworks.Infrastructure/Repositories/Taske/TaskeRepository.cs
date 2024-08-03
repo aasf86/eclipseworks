@@ -21,7 +21,8 @@ namespace eclipseworks.Infrastructure.Repositories.Taske
                     t.description,
                     t.expires,
 	                lts.value status,
-	                ltp.value priority
+	                ltp.value priority,
+                    t.userowner
                 from 
 	                taske t,
 	                lv_taske_priority ltp,

@@ -12,16 +12,18 @@ namespace eclipseworks.Domain.Entities
             DateTime? expires, 
             eStatus? status,
             ePriority? priority,
-            long projectId) 
+            long projectId, 
+            string userOwner) 
         {
             this
             .SetTitle(title)
             .SetDescription(description)
             .SetExpires(expires)
             .SetStatus(status)
-            .SetPriority(priority);            
+            .SetPriority(priority);
 
-            ProjectId = projectId;            
+            ProjectId = projectId;
+            UserOwner = userOwner;
         }
 
         public long ProjectId { get; private set; }
@@ -30,6 +32,7 @@ namespace eclipseworks.Domain.Entities
         public DateTime Expires { get; private set; }        
         public eStatus Status { get; private set; }
         public ePriority Priority { get; private set; }
+        public string UserOwner { get; private set; }
         public Project Project { get; private set; }
 
         public Taske SetTitle(string title) 

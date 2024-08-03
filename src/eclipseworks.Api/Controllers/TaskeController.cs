@@ -1,8 +1,8 @@
 ﻿using eclipseworks.Business.Contracts.UseCases.Taske;
 using eclipseworks.Business.Dtos;
-using eclipseworks.Business.Dtos.Project;
 using eclipseworks.Business.Dtos.Taske;
-using eclipseworks.Business.UseCases.Project;
+using eclipseworks.Business.Dtos.Taske;
+using eclipseworks.Business.UseCases.Taske;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -75,6 +75,33 @@ namespace eclipseworks.Api.Controllers
                 return Ok(taskeGetResponse);
 
             return NotFound(taskeGetResponse);
+        }
+
+        /// <summary>
+        /// Atualizar o nome do tarefa.
+        /// </summary>
+        /// <param name="taskeUpdate"></param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] TaskeUpdate taskeUpdate)
+        {
+            if (ModelState.IsValid)
+            {
+                if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
+
+                taskeUpdate.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
+//#if DEBUG
+                taskeUpdate.SetUserEvent("aasf86@gmail.com");
+//#endif
+                var taskeUpdateRequest = RequestBase.New(taskeUpdate, "host:api", "1.0");
+                var taskeUpdateResponse = await TaskeUseCase.Update(taskeUpdateRequest);
+
+                if (taskeUpdateResponse.IsSuccess)
+                    return Ok(taskeUpdateResponse);
+
+                return BadRequest(taskeUpdateResponse);
+            }
+            return BadRequest();
         }
     }
 }

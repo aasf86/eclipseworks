@@ -105,7 +105,8 @@ create table if not exists taske
     Description varchar(250) not null,
     Expires timestamp without time zone NOT NULL,
     StatusId int not null references lv_taske_status(Id),
-    PriorityId int not null references lv_taske_priority(Id)    
+    PriorityId int not null references lv_taske_priority(Id),
+    UserOwner varchar(100)
 );
 /*Event Sourcing*/
 /*----------*/

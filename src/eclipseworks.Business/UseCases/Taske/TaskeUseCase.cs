@@ -6,7 +6,6 @@ using eclipseworks.Domain.Contracts.Repositories.Taske;
 using eclipseworks.Infrastructure.EntitiesModels;
 using eclipseworks.Infrastructure.Repositories.Taske;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Data;
 using static eclipseworks.Domain.Entities.Taske;
 using static eclipseworks.Domain.Entities.Taske;
@@ -27,12 +26,12 @@ namespace eclipseworks.Business.UseCases.Taske
             TransactionAssigner.Add(TaskeRepository.SetTransaction);
         }
 
-        public async Task<ResponseBase<TaskeInsert>> Insert(RequestBase<TaskeInsert> taskeInsertRequest)
+        public async Task<ResponseBase<long>> Insert(RequestBase<TaskeInsert> taskeInsertRequest)
         {
             try
             {
                 var taskeInsert = taskeInsertRequest.Data;
-                var taskeInsertResponse = ResponseBase.New(taskeInsert, taskeInsertRequest.RequestId);
+                var taskeInsertResponse = ResponseBase.New((long)0, taskeInsertRequest.RequestId);
                 var result = Validate(taskeInsert);
 
                 if (!result.IsSuccess)
@@ -63,7 +62,7 @@ namespace eclipseworks.Business.UseCases.Taske
                     //aasf86 verificar no já cadastrado
 
                     await TaskeRepository.Insert(taskeEntity);
-                    taskeInsertResponse.Data.SetId(taskeEntity.Id.ToString());
+                    taskeInsertResponse.Data = taskeEntity.Id;
                 });
 
                 return taskeInsertResponse;
@@ -73,7 +72,7 @@ namespace eclipseworks.Business.UseCases.Taske
                 "Erro no [Insert] tarefa: {Title}".LogErr(taskeInsertRequest.Data.Title);
                 exc.Message.LogErr(exc);
 
-                var taskeInsertResponse = ResponseBase.New(taskeInsertRequest.Data, taskeInsertRequest.RequestId);
+                var taskeInsertResponse = ResponseBase.New((long)0, taskeInsertRequest.RequestId);
 #if DEBUG
                 taskeInsertResponse.Errors.Add(exc.Message);
 #endif
@@ -108,7 +107,8 @@ namespace eclipseworks.Business.UseCases.Taske
                         Description = taskeFromDb.Description,
                         Expires = taskeFromDb.Expires,
                         Status = taskeFromDb.Status,
-                        Priority = taskeFromDb.Priority
+                        Priority = taskeFromDb.Priority,
+                        UserOwner = taskeFromDb.UserOwner
                     };
                 });
 
@@ -126,6 +126,59 @@ namespace eclipseworks.Business.UseCases.Taske
                 taskeGetResponse.Errors.Add("Erro ao obter tarefa");
 
                 return taskeGetResponse;
+            }
+        }
+
+        public async Task<ResponseBase<bool>> Update(RequestBase<TaskeUpdate> taskeUpdateRequest)
+        {
+            try
+            {
+                var taskeUpdate = taskeUpdateRequest.Data;
+                var taskeUpdateResponse = ResponseBase.New(false, taskeUpdateRequest.RequestId);
+                var result = Validate(taskeUpdate);
+
+                if (!result.IsSuccess)
+                {
+                    taskeUpdateResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
+                    var errors = string.Join("\n", taskeUpdateResponse.Errors.ToArray());                    
+                    return taskeUpdateResponse;
+                }
+
+                await UnitOfWorkExecute(async () =>
+                {
+                    var taskeFromDb = await TaskeRepository.GetById(long.Parse(taskeUpdate.Id));
+
+                    if (taskeFromDb is null)
+                    {
+                        taskeUpdateResponse.Errors.Add(TaskeMsgDialog.NotFound);                        
+                        return;
+                    }
+
+                    taskeFromDb.SetTitle(taskeUpdate.Title);
+                    taskeFromDb.SetDescription(taskeUpdate.Description);
+                    taskeFromDb.SetExpires(taskeUpdate.Expires);
+                    taskeFromDb.SetStatus(taskeUpdate.Status);
+                    taskeFromDb.SetLastEventByUser(taskeUpdate.UserEvent);                    
+
+                    await TaskeRepository.Update(taskeFromDb);
+
+                    taskeUpdateResponse.Data = true;
+                });
+
+                return taskeUpdateResponse;
+            }
+            catch (Exception exc)
+            {
+                "Erro ao [Update] tarefa: {TaskeId}".LogErr(taskeUpdateRequest.Data.Id);
+                exc.Message.LogErr(exc);
+
+                var taskeUpdateResponse = ResponseBase.New(false, taskeUpdateRequest.RequestId);
+#if DEBUG
+                taskeUpdateResponse.Errors.Add(exc.Message);
+#endif
+                taskeUpdateResponse.Errors.Add("Erro ao alterar tarefa.");
+
+                return taskeUpdateResponse;
             }
         }
 

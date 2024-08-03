@@ -12,6 +12,6 @@ namespace eclipseworks.Business.Dtos.Taske
         public DateTime Expires { get; set; }
         public eStatus Status { get; set; }
         public ePriority Priority { get; set; }
-        public ProjectGet Project { get; set; } = new ProjectGet();
+        public string UserOwner { get; set; } = "";
     }
 }

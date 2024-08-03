@@ -5,6 +5,7 @@
         public static class TaskeRule
         {
             //aasf86
+            public const int IdValueMinimalLenth = 1;
             public const int TitleMinimalLenth = 3;
             public const int TitleMaxLenth = 250;
 
@@ -31,7 +32,8 @@
             public const string RequiredUser = "Informe o usuário da tarefa.";
             public const string NotFound = "Tarefa não encontada.";
             public const string NotAllowedChangePriority = "Não é permitido alterar prioridade.";
-            
+            public const string InvalidId = "Informe id da tarefa.";
+
         }
 
         public enum eStatus
