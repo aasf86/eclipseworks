@@ -1,4 +1,6 @@
-﻿namespace eclipseworks.Domain.Entities
+﻿using System.Threading.Tasks;
+
+namespace eclipseworks.Domain.Entities
 {
     public partial class Taske : EntityBase
     {
@@ -18,18 +20,18 @@
             .SetExpires(expires)
             .SetStatus(status);
 
-            if (status is null || status == eStatus.Nulo) throw new InvalidDataException(TaskeMsgDialog.RequiredStatus);
+            if (priority is null || priority == ePriority.Nulo) throw new InvalidDataException(TaskeMsgDialog.RequiredPriority);
 
             ProjectId = projectId;
-            Status = status.Value;
+            Priority = priority.Value;
         }
 
+        public long ProjectId { get; private set; }
         public string Title { get; private set; }
-        public string Description { get; private set; }
-        public DateTime Expires { get; private set; }
+        public string Description { get; private set; }        
+        public DateTime Expires { get; private set; }        
         public eStatus Status { get; private set; }
         public ePriority Priority { get; private set; }
-        public long ProjectId { get; private set; }
         public Project Project { get; private set; }
 
         public Taske SetTitle(string title) 

@@ -72,7 +72,7 @@ namespace eclipseworks.Test.Unit
         #region [Insert]
 
         [Fact(DisplayName = "[Insert] Inserir com sucesso")]
-        public async void Insert_Project_With_Success()
+        public async Task Insert_Project_With_Success()
         {
             Setup();
 
@@ -90,7 +90,7 @@ namespace eclipseworks.Test.Unit
         }
 
         [Fact(DisplayName = "[Insert] Quando request estiver sem nome, retorne erro")]
-        public async void When_Insert_Project_Without_Name_Then_Return_As_Erro()
+        public async Task When_Insert_Project_Without_Name_Then_Return_As_Erro()
         {
             Setup();
 
@@ -108,7 +108,7 @@ namespace eclipseworks.Test.Unit
         }
 
         [Fact(DisplayName = "[Insert] Quando request estiver sem usuário, retorno erro")]
-        public async void When_Insert_Project_Without_User_Then_Return_As_Erro()
+        public async Task When_Insert_Project_Without_User_Then_Return_As_Erro()
         {
             Setup();
 
@@ -129,7 +129,7 @@ namespace eclipseworks.Test.Unit
         #region [Update]
 
         [Fact(DisplayName = "[Update] Alterar com sucesso")]
-        public async void Update_Project_With_Success()
+        public async Task Update_Project_With_Success()
         {
             Setup();
 
@@ -150,7 +150,7 @@ namespace eclipseworks.Test.Unit
         }
 
         [Fact(DisplayName = "[Update] Quando request estiver sem nome, retorne erro")]
-        public async void When_Update_Project_Without_Name_Then_Return_As_Erro()
+        public async Task When_Update_Project_Without_Name_Then_Return_As_Erro()
         {
             Setup();
 
@@ -171,7 +171,7 @@ namespace eclipseworks.Test.Unit
         }
 
         [Fact(DisplayName = "[Update] Quando não encontrar id retornar com erro.")]
-        public async void When_Not_Fount_Item_Id_Then_Return_As_Erro()
+        public async Task When_Not_Fount_Item_Id_Then_Return_As_Erro()
         {
             Setup_Without_Model();
 
@@ -194,7 +194,7 @@ namespace eclipseworks.Test.Unit
         #region [Delete]
 
         [Fact(DisplayName = "[Delete] Deletar com sucesso")]
-        public async void Delete_With_Success()
+        public async Task Delete_With_Success()
         {
             Setup();
 
@@ -212,7 +212,7 @@ namespace eclipseworks.Test.Unit
         }
 
         [Fact(DisplayName = "[Delete] Quando Id inválido, retornar como erro")]
-        public async void When_Id_Invalid_Then_Returno_As_Success()
+        public async Task When_Id_Invalid_Then_Returno_As_Success()
         {
             Setup();
 
@@ -227,11 +227,11 @@ namespace eclipseworks.Test.Unit
             var projectUpdateResponse = await _projectUseCase.Delete(projectDeleteRequest);
 
             Assert.False(projectUpdateResponse.IsSuccess);
-            Assert.True(projectUpdateResponse.Errors.Contains(ProjectMsgDialog.InvalidId));
+            Assert.Contains(ProjectMsgDialog.InvalidId, projectUpdateResponse.Errors);
         }
 
         [Fact(DisplayName = "[Delete] Quando sem usuário, retornar como erro")]
-        public async void When_Without_UserEvent_Then_Return_As_Success()
+        public async Task When_Without_UserEvent_Then_Return_As_Success()
         {
             Setup();
 
@@ -242,11 +242,11 @@ namespace eclipseworks.Test.Unit
             var projectUpdateResponse = await _projectUseCase.Delete(projectDeleteRequest);
 
             Assert.False(projectUpdateResponse.IsSuccess);
-            Assert.True(projectUpdateResponse.Errors.Contains(ProjectMsgDialog.RequiredUserEvent));
+            Assert.Contains(ProjectMsgDialog.RequiredUserEvent, projectUpdateResponse.Errors);
         }
 
         [Fact(DisplayName = "[Delete] Quando não encontrar projeto, retornar como erro")]
-        public async void When_Not_Found_Item_Then_Return_As_Success()
+        public async Task When_Not_Found_Item_Then_Return_As_Success()
         {
             Setup_Without_Model();
 
@@ -257,7 +257,7 @@ namespace eclipseworks.Test.Unit
             var projectUpdateResponse = await _projectUseCase.Delete(projectDeleteRequest);
 
             Assert.False(projectUpdateResponse.IsSuccess);
-            Assert.True(projectUpdateResponse.Errors.Contains(ProjectMsgDialog.NotFound));
+            Assert.Contains(ProjectMsgDialog.NotFound, projectUpdateResponse.Errors);
         }
 
         #endregion
@@ -265,7 +265,7 @@ namespace eclipseworks.Test.Unit
         #region [Get]
 
         [Fact(DisplayName ="[Get] Encontrar projeto com sucesso")]
-        public async void Found_Item_With_Success()
+        public async Task Found_Item_With_Success()
         {
             Setup();
 
@@ -278,7 +278,7 @@ namespace eclipseworks.Test.Unit
         }
 
         [Fact(DisplayName = "[Get] Quando Id for inválido, retornar como erro")]
-        public async void When_Invalid_Id_Item_Then_Return_As_Error()
+        public async Task When_Invalid_Id_Item_Then_Return_As_Error()
         {
             Setup();
 
@@ -286,12 +286,12 @@ namespace eclipseworks.Test.Unit
             var projectGetRequest = RequestBase.New(projectGet);
             var projectGetResponse = await _projectUseCase.GetById(projectGetRequest);
 
-            Assert.False(projectGetResponse.IsSuccess);
-            Assert.True(projectGetResponse.Errors.Contains(ProjectMsgDialog.InvalidId));
+            Assert.False(projectGetResponse.IsSuccess);            
+            Assert.Contains(ProjectMsgDialog.InvalidId, projectGetResponse.Errors);
         }
 
         [Fact(DisplayName = "[Get] Quando não encontrar projeto, retornar como erro")]
-        public async void When_Not_Found_Item_Id_Then_Return_As_Success()
+        public async Task When_Not_Found_Item_Id_Then_Return_As_Success()
         {
             Setup_Without_Model();
 
@@ -300,7 +300,7 @@ namespace eclipseworks.Test.Unit
             var projectGetResponse = await _projectUseCase.GetById(projectGetRequest);
 
             Assert.False(projectGetResponse.IsSuccess);
-            Assert.True(projectGetResponse.Errors.Contains(ProjectMsgDialog.NotFound));
+            Assert.Contains(ProjectMsgDialog.NotFound, projectGetResponse.Errors);
         }
 
         #endregion

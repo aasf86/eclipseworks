@@ -41,9 +41,9 @@ namespace eclipseworks.Api.Controllers
                 if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
 
                 projectInsert.SetUserOwner(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
-#if DEBUG
+//#if DEBUG
                 projectInsert.SetUserOwner("aasf86@gmail.com");
-#endif
+//#endif
                 var ProjectInsertRequest = RequestBase.New(projectInsert, "host:api", "1.0");
                 var ProjectInsertResponse = await ProjectUseCase.Insert(ProjectInsertRequest);
 
@@ -93,9 +93,9 @@ namespace eclipseworks.Api.Controllers
         {
             var projectDelete = new ProjectDelete { Id = id.ToString() };
             projectDelete.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
-#if DEBUG
+//#if DEBUG
             projectDelete.SetUserEvent("aasf86@gmail.com");
-#endif
+//#endif
             var result = ProjectUseCase.Validate(projectDelete);
 
             if (!result.IsSuccess) return BadRequest(ResponseBase.New(
@@ -129,9 +129,9 @@ namespace eclipseworks.Api.Controllers
                 if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
 
                 projectUpdate.SetUserEvent(User?.FindAll(ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value ?? "");
-#if DEBUG
+//#if DEBUG
                 projectUpdate.SetUserEvent("aasf86@gmail.com");
-#endif
+//#endif
                 var projectUpdateRequest = RequestBase.New(projectUpdate, "host:api", "1.0");
                 var projectUpdateResponse = await ProjectUseCase.Update(projectUpdateRequest);
 

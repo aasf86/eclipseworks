@@ -7,6 +7,6 @@ namespace eclipseworks.Domain.Contracts.Repositories
         : IWriteData<TEntity>, IReadData<TEntity>
         where TEntity : class
     {
-        void SetTransaction(IDbTransaction dbTransaction);
+        new void SetTransaction(IDbTransaction dbTransaction);
     }
 }
