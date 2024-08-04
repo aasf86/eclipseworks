@@ -1,6 +1,4 @@
 ﻿/*Script de criação de tabelas eclipseworks*/
-/*aasf86 remover comentarios não usados*/
-
 create schema events;
 
 /*######################## <project> ########################*/

@@ -1,5 +1,4 @@
-﻿using eclipseworks.Domain.Entities;
-using System.Data;
+﻿using System.Data;
 
 namespace eclipseworks.Domain.Contracts.Repositories
 {

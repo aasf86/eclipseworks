@@ -1,8 +1,10 @@
-﻿using eclipseworks.Business.Contracts.UseCases.Taske;
+﻿using eclipseworks.Business.Auth;
+using eclipseworks.Business.Contracts.UseCases.Taske;
 using eclipseworks.Business.Dtos;
 using eclipseworks.Business.Dtos.Taske;
 using eclipseworks.Domain.Contracts.Repositories.Project;
 using eclipseworks.Domain.Contracts.Repositories.Taske;
+using eclipseworks.Domain.Entities.ValueObjects;
 using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
 using System.Data;
@@ -286,6 +288,40 @@ namespace eclipseworks.Business.UseCases.Taske
                 taskeGetResponse.Errors.Add(exc.Message);
 #endif
                 taskeGetResponse.Errors.Add("Erro ao obter tarefas");
+
+                return taskeGetResponse;
+            }
+        }
+
+        public async Task<ResponseBase<List<TaskeReport>>> GetReport()
+        {
+            try
+            {
+#warning Verifica se é gerente(RoleTypeClaim.Manager)
+//#if !DEBUG
+                //if (!IsInRole(RoleTypeClaim.Manager)) throw new UnauthorizedAccessException();
+//#endif
+                var taskeReportResponse = ResponseBase.New(new List<TaskeReport>());
+
+                await UnitOfWorkExecute(async () =>
+                {
+                    var taskeReportFromDb = await TaskeRepository.GetReport(TaskeRule.DaysReport);
+
+                    taskeReportResponse.Data = taskeReportFromDb;
+                });
+
+                return taskeReportResponse;
+            }
+            catch (Exception exc)
+            {
+                "Erro no [GetReport] tarefas".LogErr();
+                exc.Message.LogErr(exc);
+
+                var taskeGetResponse = ResponseBase.New(new List<TaskeReport>());
+#if DEBUG
+                taskeGetResponse.Errors.Add(exc.Message);
+#endif
+                taskeGetResponse.Errors.Add("Erro ao obter relatório de tarefas");
 
                 return taskeGetResponse;
             }

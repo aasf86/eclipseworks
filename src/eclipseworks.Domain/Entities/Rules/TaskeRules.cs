@@ -10,6 +10,7 @@
             public const int DescriptionMinimalLenth = 3;
             public const int DescriptionMaxLenth = 250;
             public const int MaximumNumberTaskesPerProject = 20;
+            public const int DaysReport = 30;
         }
 
         public static class TaskeMsgDialog
@@ -28,7 +29,6 @@
             public const string NotAllowedChangePriority = "Não é permitido alterar prioridade.";
             public const string InvalidId = "Informe id da tarefa.";
             public const string LimitReached = "Limite de tarefas atingido para o projeto. Quantidade permitida: {0}.";
-
         }
 
         public enum eStatus
@@ -46,7 +46,5 @@
             Low = 2,
             High = 3
         }
-
-
     }
 }

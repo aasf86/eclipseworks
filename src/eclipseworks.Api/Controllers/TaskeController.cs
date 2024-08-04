@@ -1,6 +1,8 @@
-﻿using eclipseworks.Business.Contracts.UseCases.Taske;
+﻿using eclipseworks.Business.Auth;
+using eclipseworks.Business.Contracts.UseCases.Taske;
 using eclipseworks.Business.Dtos;
 using eclipseworks.Business.Dtos.Taske;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -146,6 +148,27 @@ namespace eclipseworks.Api.Controllers
                 return Ok(taskeGetResponse);
 
             return BadRequest(taskeGetResponse);
+        }
+
+        /// <summary>
+        /// Obtem dados para relatorio de tarefas por usuários nos ultimos 30 dias.
+        /// </summary>        
+        /// <returns></returns>
+#warning Verifica se é gerente(RoleTypeClaim.Manager)
+//#if !DEBUG
+        //[Authorize(Roles = RoleTypeClaim.Manager)]
+//#endif
+        [HttpGet("Report")]
+        public async Task<IActionResult> GetReport()
+        {
+            if (User is not null) Thread.CurrentPrincipal = new ClaimsPrincipal(User.Identity);
+
+            var reportResponse = await TaskeUseCase.GetReport();
+
+            if (reportResponse.IsSuccess)
+                return Ok(reportResponse);
+            
+            return BadRequest(reportResponse);
         }
     }
 }

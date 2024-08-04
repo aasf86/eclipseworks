@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace eclipseworks.Domain.Entities
+﻿namespace eclipseworks.Domain.Entities
 {
     public partial class Taske : EntityBase
     {

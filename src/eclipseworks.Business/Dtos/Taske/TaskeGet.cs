@@ -1,5 +1,4 @@
-﻿using eclipseworks.Business.Dtos.Project;
-using static eclipseworks.Domain.Entities.Taske;
+﻿using static eclipseworks.Domain.Entities.Taske;
 
 namespace eclipseworks.Business.Dtos.Taske
 {

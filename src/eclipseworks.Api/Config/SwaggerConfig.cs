@@ -1,5 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace eclipseworks.Api.Config
 {
