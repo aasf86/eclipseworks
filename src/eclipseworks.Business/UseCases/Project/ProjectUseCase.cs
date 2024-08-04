@@ -17,7 +17,7 @@ namespace eclipseworks.Business.UseCases.Project
         private IProjectRepository<ProjectModel> ProjectRepository => _projectRepository;        
 
         public ProjectUseCase(
-            ILogger<ProjectUseCase> logger, 
+            ILogger<ProjectUseCase> logger,
             IProjectRepository<ProjectModel> projectRepository,
             IDbConnection dbConnection) : base(logger, dbConnection) 
         {

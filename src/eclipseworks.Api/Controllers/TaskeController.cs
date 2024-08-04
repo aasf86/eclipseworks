@@ -132,14 +132,14 @@ namespace eclipseworks.Api.Controllers
         /// <summary>
         /// Procura tarefas pelo 'título e descrição'.
         /// </summary>
-        /// <param name="name">Para buscar todos insira '%'</param>
+        /// <param name="filter">Para buscar todos insira '%'</param>
         /// <returns></returns>
-        [HttpGet("all/{name}")]
-        public async Task<IActionResult> GetAll(string? name = null)
+        [HttpGet("all/{filter}")]
+        public async Task<IActionResult> GetAll(string? filter = null)
         {
-            if (string.IsNullOrWhiteSpace(name)) return BadRequest(ResponseBase.New(new List<TaskeGet>(), Guid.NewGuid()));
+            if (string.IsNullOrWhiteSpace(filter)) return BadRequest(ResponseBase.New(new List<TaskeGet>(), Guid.NewGuid()));
 
-            var taskeGetAllRequest = RequestBase.New(name, "host:api", "1.0");
+            var taskeGetAllRequest = RequestBase.New(filter, "host:api", "1.0");
             var taskeGetResponse = await TaskeUseCase.GetAll(taskeGetAllRequest);
 
             if (taskeGetResponse.IsSuccess)

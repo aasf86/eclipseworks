@@ -24,6 +24,7 @@ namespace eclipseworks.Infrastructure.Config
 
             services.AddScoped<IProjectRepository<ProjectModel>, ProjectRepository>();
             services.AddScoped<ITaskeRepository<TaskeModel>, TaskeRepository>();
+            services.AddScoped<ITaskeCommentRepository<TaskeCommentModel>, TaskeCommentRepository>();
 
             return services;
         }

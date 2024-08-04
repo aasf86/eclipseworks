@@ -1,26 +1,15 @@
-﻿using System.Runtime.ConstrainedExecution;
-
-namespace eclipseworks.Domain.Entities
+﻿namespace eclipseworks.Domain.Entities
 {
     public partial class Taske
     {
         public static class TaskeRule
         {
-            //aasf86
             public const int IdValueMinimalLenth = 1;
             public const int TitleMinimalLenth = 3;
             public const int TitleMaxLenth = 250;
-
             public const int DescriptionMinimalLenth = 3;
             public const int DescriptionMaxLenth = 250;
-
             public const int MaximumNumberTaskesPerProject = 20;
-
-            /*
-            public const int IdValueMinimalLenth = 1;
-            public const int NameMinimalLenth = 3;
-            public const int NameMaxLenth = 250;
-            */
         }
 
         public static class TaskeMsgDialog
@@ -57,5 +46,7 @@ namespace eclipseworks.Domain.Entities
             Low = 2,
             High = 3
         }
+
+
     }
 }
