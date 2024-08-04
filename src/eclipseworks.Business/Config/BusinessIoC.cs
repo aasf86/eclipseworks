@@ -12,7 +12,7 @@ namespace eclipseworks.Business.Config
         public static IServiceCollection AddBusinessIoC(this IServiceCollection services)
         {
             services.AddScoped<IProjectUseCase, ProjectUseCase>();
-            services.AddScoped<ITaskeUseCase, TaskeUseCase>();
+            services.AddScoped<ITaskeCommentUseCase, TaskeCommentUseCase>();
 
             return services;
         }

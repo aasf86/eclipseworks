@@ -6,6 +6,7 @@ using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using static eclipseworks.Domain.Entities.Taske;
+using static eclipseworks.Domain.Entities.TaskeComment;
 
 namespace eclipseworks.Business.UseCases.Taske
 {
@@ -23,256 +24,228 @@ namespace eclipseworks.Business.UseCases.Taske
             TransactionAssigner.Add(TaskeCommentRepository.SetTransaction);
         }
 
-        public async Task<ResponseBase<long>> Insert(RequestBase<TaskeInsert> taskeInsertRequest)
+        public async Task<ResponseBase<long>> Insert(RequestBase<TaskeCommentInsert> commentInsertRequest)
         {
             try
             {
-                var taskeInsert = taskeInsertRequest.Data;
-                var taskeInsertResponse = ResponseBase.New((long)0, taskeInsertRequest.RequestId);
-                var result = Validate(taskeInsert);
+                var commentInsert = commentInsertRequest.Data;
+                var commentInsertResponse = ResponseBase.New((long)0, commentInsertRequest.RequestId);
+                var result = Validate(commentInsert);
 
                 if (!result.IsSuccess)
                 {
-                    taskeInsertResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
-                    var errors = string.Join("\n", taskeInsertResponse.Errors.ToArray());
-                    return taskeInsertResponse;
+                    commentInsertResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
+                    var errors = string.Join("\n", commentInsertResponse.Errors.ToArray());
+                    return commentInsertResponse;
                 }
 
-                if (string.IsNullOrEmpty(taskeInsert.UserOwner))
+                if (string.IsNullOrEmpty(commentInsert.UserOwner))
                 {
-                    taskeInsertResponse.Errors.Add(TaskeMsgDialog.RequiredUser);
-                    return taskeInsertResponse;
+                    commentInsertResponse.Errors.Add(TaskeCommentMsgDialog.RequiredUser);
+                    return commentInsertResponse;
                 }
-
-                var taskeEntity = new TaskeCommentModel(
-                    taskeInsert.UserOwner,
-                    taskeInsert.Title,
-                    taskeInsert.Description,
-                    taskeInsert.Expires,
-                    taskeInsert.Status,
-                    taskeInsert.Priority,
-                    long.Parse(taskeInsert.ProjectId));
-
+                
+                var commentEntity = new TaskeCommentModel(commentInsert.Comment, commentInsert.UserOwner);
+                
                 await UnitOfWorkExecute(async () =>
                 {
-                    var limitReached = await TaskeCommentRepository.TaskeLimitReached(taskeEntity.ProjectId, TaskeRule.MaximumNumberTaskesPerProject);
-
-                    if (limitReached)
-                    {
-                        taskeInsertResponse.Errors.Add(string.Format(TaskeMsgDialog.LimitReached, TaskeRule.MaximumNumberTaskesPerProject));
-                        return;
-                    }
-
-                    await TaskeCommentRepository.Insert(taskeEntity);
-                    taskeInsertResponse.Data = taskeEntity.Id;
+                    await TaskeCommentRepository.Insert(commentEntity);
+                    commentInsertResponse.Data = commentEntity.Id;
                 });
 
-                return taskeInsertResponse;
+                return commentInsertResponse;
             }
             catch (Exception exc)
             {
-                "Erro no [Insert] tarefa: {Title}".LogErr(taskeInsertRequest.Data.Title);
+                "Erro no [Insert] comentário: {Comment}".LogErr(commentInsertRequest.Data);
                 exc.Message.LogErr(exc);
 
-                var taskeInsertResponse = ResponseBase.New((long)0, taskeInsertRequest.RequestId);
+                var commentInsertResponse = ResponseBase.New((long)0, commentInsertRequest.RequestId);
 #if DEBUG
-                taskeInsertResponse.Errors.Add(exc.Message);
+                commentInsertResponse.Errors.Add(exc.Message);
 #endif
-                taskeInsertResponse.Errors.Add("Erro ao inserir tarefa.");
+                commentInsertResponse.Errors.Add("Erro ao inserir comentário.");
 
-                return taskeInsertResponse;
+                return commentInsertResponse;
             }
         }
 
-        public async Task<ResponseBase<TaskeGet>> GetById(RequestBase<long> taskeGetRequest)
+        public async Task<ResponseBase<TaskeCommentGet>> GetById(RequestBase<long> commentGetRequest)
         {
             try
             {
-                var taskeId = taskeGetRequest.Data;
-                var taskeGetResponse = ResponseBase.New(new TaskeGet(), taskeGetRequest.RequestId);
+                var commentId = commentGetRequest.Data;
+                var commentGetResponse = ResponseBase.New(new TaskeCommentGet(), commentGetRequest.RequestId);
 
-                if (taskeId <= 0) return taskeGetResponse;
+                if (commentId <= 0) return commentGetResponse;
 
                 await UnitOfWorkExecute(async () =>
                 {
-                    var taskeFromDb = await TaskeCommentRepository.GetById(taskeId);
+                    var commentFromDb = await TaskeCommentRepository.GetById(commentId);
 
-                    if (taskeFromDb is null)
+                    if (commentFromDb is null)
                     {
-                        taskeGetResponse.Errors.Add(TaskeMsgDialog.NotFound);
+                        commentGetResponse.Errors.Add(TaskeCommentMsgDialog.NotFound);
                         return;
                     }
 
-                    taskeGetResponse.Data = new TaskeGet
+                    commentGetResponse.Data = new TaskeCommentGet
                     {
-                        Id = taskeFromDb.Id,
-                        ProjectId = taskeFromDb.ProjectId,
-                        Title = taskeFromDb.Title,
-                        Description = taskeFromDb.Description,
-                        Expires = taskeFromDb.Expires,
-                        Status = taskeFromDb.Status,
-                        Priority = taskeFromDb.Priority,
-                        UserOwner = taskeFromDb.UserOwner
-                    };
+                        Id = commentFromDb.Id,
+                        Comment = commentFromDb.Comment,
+                        UserOwner = commentFromDb.UserOwner
+                    };                    
                 });
 
-                return taskeGetResponse;
+                return commentGetResponse;
             }
             catch (Exception exc)
             {
-                "Erro no [GetById] tarefa: {TaskeId}".LogErr(taskeGetRequest.Data);
+                "Erro no [GetById] comentário: {CommentId}".LogErr(commentGetRequest.Data);
                 exc.Message.LogErr(exc);
 
-                var taskeGetResponse = ResponseBase.New(new TaskeGet(), taskeGetRequest.RequestId);
+                var commentGetResponse = ResponseBase.New(new TaskeCommentGet(), commentGetRequest.RequestId);
 #if DEBUG
-                taskeGetResponse.Errors.Add(exc.Message);
+                commentGetResponse.Errors.Add(exc.Message);
 #endif
-                taskeGetResponse.Errors.Add("Erro ao obter tarefa");
+                commentGetResponse.Errors.Add("Erro ao obter comentário");
 
-                return taskeGetResponse;
+                return commentGetResponse;
             }
         }
 
-        public async Task<ResponseBase<bool>> Update(RequestBase<TaskeUpdate> taskeUpdateRequest)
+        public async Task<ResponseBase<bool>> Update(RequestBase<TaskeCommentUpdate> commentUpdateRequest)
         {
             try
             {
-                var taskeUpdate = taskeUpdateRequest.Data;
-                var taskeUpdateResponse = ResponseBase.New(false, taskeUpdateRequest.RequestId);
-                var result = Validate(taskeUpdate);
+                var commentUpdate = commentUpdateRequest.Data;
+                var commentUpdateResponse = ResponseBase.New(false, commentUpdateRequest.RequestId);
+                var result = Validate(commentUpdate);
 
                 if (!result.IsSuccess)
                 {
-                    taskeUpdateResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
-                    var errors = string.Join("\n", taskeUpdateResponse.Errors.ToArray());
-                    return taskeUpdateResponse;
+                    commentUpdateResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
+                    var errors = string.Join("\n", commentUpdateResponse.Errors.ToArray());
+                    return commentUpdateResponse;
                 }
 
                 await UnitOfWorkExecute(async () =>
                 {
-                    var taskeFromDb = await TaskeCommentRepository.GetById(long.Parse(taskeUpdate.Id));
+                    var commentFromDb = await TaskeCommentRepository.GetById(long.Parse(commentUpdate.Id));
 
-                    if (taskeFromDb is null)
+                    if (commentFromDb is null)
                     {
-                        taskeUpdateResponse.Errors.Add(TaskeMsgDialog.NotFound);
+                        commentUpdateResponse.Errors.Add(TaskeCommentMsgDialog.NotFound);
                         return;
                     }
 
-                    taskeFromDb.SetTitle(taskeUpdate.Title);
-                    taskeFromDb.SetDescription(taskeUpdate.Description);
-                    taskeFromDb.SetExpires(taskeUpdate.Expires);
-                    taskeFromDb.SetStatus(taskeUpdate.Status);
-                    taskeFromDb.SetLastEventByUser(taskeUpdate.UserEvent);
+                    commentFromDb.SetComment(commentUpdate.Comment);
+                    commentFromDb.SetLastEventByUser(commentUpdate.UserEvent);
 
-                    await TaskeCommentRepository.Update(taskeFromDb);
+                    await TaskeCommentRepository.Update(commentFromDb);
 
-                    taskeUpdateResponse.Data = true;
+                    commentUpdateResponse.Data = true;
                 });
 
-                return taskeUpdateResponse;
+                return commentUpdateResponse;
             }
             catch (Exception exc)
             {
-                "Erro ao [Update] tarefa: {TaskeId}".LogErr(taskeUpdateRequest.Data.Id);
+                "Erro ao [Update] comentário: {CommentId}".LogErr(commentUpdateRequest.Data.Id);
                 exc.Message.LogErr(exc);
 
-                var taskeUpdateResponse = ResponseBase.New(false, taskeUpdateRequest.RequestId);
+                var commentUpdateResponse = ResponseBase.New(false, commentUpdateRequest.RequestId);
 #if DEBUG
-                taskeUpdateResponse.Errors.Add(exc.Message);
+                commentUpdateResponse.Errors.Add(exc.Message);
 #endif
-                taskeUpdateResponse.Errors.Add("Erro ao alterar tarefa.");
+                commentUpdateResponse.Errors.Add("Erro ao alterar comentário.");
 
-                return taskeUpdateResponse;
+                return commentUpdateResponse;
             }
         }
 
-        public async Task<ResponseBase<bool>> Delete(RequestBase<TaskeDelete> taskeDeleteRequest)
+        public async Task<ResponseBase<bool>> Delete(RequestBase<TaskeCommentDelete> commentDeleteRequest)
         {
             try
             {
-                var taskeDelete = taskeDeleteRequest.Data;
-                var taskeDeleteResponse = ResponseBase.New(false, taskeDeleteRequest.RequestId);
-                var result = Validate(taskeDelete);
+                var commentDelete = commentDeleteRequest.Data;
+                var commentDeleteResponse = ResponseBase.New(false, commentDeleteRequest.RequestId);
+                var result = Validate(commentDelete);
 
                 if (!result.IsSuccess)
                 {
-                    taskeDeleteResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
-                    return taskeDeleteResponse;
+                    commentDeleteResponse.Errors.AddRange(result.Validation.Select(x => x.ErrorMessage).ToList());
+                    return commentDeleteResponse;
                 }
 
                 await UnitOfWorkExecute(async () =>
                 {
-                    var taskeFromDb = await TaskeCommentRepository.GetById(long.Parse(taskeDelete.Id));
+                    var commentFromDb = await TaskeCommentRepository.GetById(long.Parse(commentDelete.Id));
 
-                    if (taskeFromDb is null)
+                    if (commentFromDb is null)
                     {
-                        taskeDeleteResponse.Errors.Add(TaskeMsgDialog.NotFound);
+                        commentDeleteResponse.Errors.Add(TaskeCommentMsgDialog.NotFound);
                         return;
                     }
 
-                    taskeFromDb.SetLastEventByUser(taskeDelete.UserEvent);
+                    commentFromDb.SetLastEventByUser(commentDelete.UserEvent);
 
-                    await TaskeCommentRepository.Update(taskeFromDb);
+                    await TaskeCommentRepository.Update(commentFromDb);
 
-                    await TaskeCommentRepository.Delete(taskeFromDb);
+                    await TaskeCommentRepository.Delete(commentFromDb);
 
-                    taskeDeleteResponse.Data = true;
+                    commentDeleteResponse.Data = true;
                 });
 
-                return taskeDeleteResponse;
+                return commentDeleteResponse;
             }
             catch (Exception exc)
             {
-                "Erro [Delete] tarefa: {TaskeId}".LogErr(taskeDeleteRequest.Data.Id);
+                "Erro [Delete] comentário: {CommentId}".LogErr(commentDeleteRequest.Data.Id);
                 exc.Message.LogErr(exc);
 
-                var taskeDeleteResponse = ResponseBase.New(false, taskeDeleteRequest.RequestId);
+                var commentDeleteResponse = ResponseBase.New(false, commentDeleteRequest.RequestId);
 #if DEBUG
-                taskeDeleteResponse.Errors.Add(exc.Message);
+                commentDeleteResponse.Errors.Add(exc.Message);
 #endif
-                taskeDeleteResponse.Errors.Add("Erro ao excluir tarefa.");
+                commentDeleteResponse.Errors.Add("Erro ao excluir comentário.");
 
-                return taskeDeleteResponse;
+                return commentDeleteResponse;
             }
         }
 
-        public async Task<ResponseBase<List<TaskeGet>>> GetAll(RequestBase<string> taskeGetRequest)
+        public async Task<ResponseBase<List<TaskeCommentGet>>> GetAll(RequestBase<string> commentGetRequest)
         {
             try
             {
-                var taskeGetResponse = ResponseBase.New(new List<TaskeGet>(), taskeGetRequest.RequestId);
+                var commentGetResponse = ResponseBase.New(new List<TaskeCommentGet>(), commentGetRequest.RequestId);
 
                 await UnitOfWorkExecute(async () =>
                 {
-                    var listTaskesFromDb = await TaskeCommentRepository.GetAll(taskeGetRequest.Data);
+                    var listCommentsFromDb = await TaskeCommentRepository.GetAll(commentGetRequest.Data);
 
-                    taskeGetResponse.Data = listTaskesFromDb.Select(x => new TaskeGet
+                    commentGetResponse.Data = listCommentsFromDb.Select(x => new TaskeCommentGet
                     {
                         Id = x.Id,
-                        Title = x.Title,
-                        Description = x.Description,
-                        Expires = x.Expires,
-                        Status = x.Status,
-                        Priority = x.Priority,
-                        ProjectId = x.ProjectId,
+                        Comment = x.Comment,
                         UserOwner = x.UserOwner
                     }).ToList();
                 });
 
-                return taskeGetResponse;
+                return commentGetResponse;
             }
             catch (Exception exc)
             {
-                "Erro no [GetAll] tarefas: {TaskeName}".LogErr(taskeGetRequest.Data);
+                "Erro no [GetAll] comentários: {Comment}".LogErr(commentGetRequest.Data);
                 exc.Message.LogErr(exc);
 
-                var taskeGetResponse = ResponseBase.New(new List<TaskeGet>(), taskeGetRequest.RequestId);
+                var commentGetResponse = ResponseBase.New(new List<TaskeCommentGet>(), commentGetRequest.RequestId);
 #if DEBUG
-                taskeGetResponse.Errors.Add(exc.Message);
+                commentGetResponse.Errors.Add(exc.Message);
 #endif
-                taskeGetResponse.Errors.Add("Erro ao obter tarefas");
+                commentGetResponse.Errors.Add("Erro ao obter comentários");
 
-                return taskeGetResponse;
+                return commentGetResponse;
             }
         }
 

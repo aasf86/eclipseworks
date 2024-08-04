@@ -49,10 +49,7 @@ namespace eclipseworks.Business.UseCases.Project
                 var projectEntity = new ProjectModel(projectInsert.Name, projectInsert.UserOwner);
 
                 await UnitOfWorkExecute(async () =>
-                {                    
-                    //var ProjectFromDb = await ProjectRepository.GetByPlate(projectInsert.Plate);
-                    //aasf86 verificar no já cadastrado
-
+                {
                     await ProjectRepository.Insert(projectEntity);
                     projectInsertResponse.Data.SetId(projectEntity.Id.ToString());
                 });

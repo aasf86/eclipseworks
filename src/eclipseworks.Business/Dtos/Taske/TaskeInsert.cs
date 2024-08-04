@@ -1,5 +1,4 @@
-﻿using eclipseworks.Business.Dtos.Project;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using static eclipseworks.Domain.Entities.Taske;
 
 namespace eclipseworks.Business.Dtos.Taske

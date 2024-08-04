@@ -7,7 +7,7 @@
         public TaskeComment(string comment, string userOwner)
         {
             SetComment(comment);
-            if (string.IsNullOrEmpty(userOwner)) throw new InvalidDataException(TaskeCommentMsgDialog.RequiredUserOwner);
+            if (string.IsNullOrEmpty(userOwner)) throw new InvalidDataException(TaskeCommentMsgDialog.RequiredUser);
 
             Comment = comment;
             UserOwner = userOwner;

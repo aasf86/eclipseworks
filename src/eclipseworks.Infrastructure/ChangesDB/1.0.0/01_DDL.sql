@@ -196,3 +196,78 @@ before delete on taske
 for each row
 execute procedure events.fn_tg_taske();
 /*######################## </taske> ########################*/
+
+/*######################## <taske_comment> ########################*/
+
+create table if not exists taske_comment
+(
+	Id bigserial not null primary key,
+    Guid uuid DEFAULT gen_random_uuid(), 
+    Inserted timestamp without time zone NOT NULL DEFAULT now(),
+    Updated timestamp without time zone NOT NULL DEFAULT now(),
+    LastEventByUser varchar(100),
+
+    Comment varchar(500) not null, /*aasf86 faltou definir o size no pedido, colocar isso na 2ª fase*/
+    UserOwner varchar(100)
+);
+/*Event Sourcing*/
+/*----------*/
+create table if not exists events.taske_comment
+(
+	Id bigserial not null primary key,
+    TaskeCommentId bigint not null,
+    TransactionId uuid DEFAULT gen_random_uuid(), 
+    Inserted timestamp without time zone NOT NULL DEFAULT now(),
+    EventUser varchar(100),
+    Event varchar(100),
+    Object json    
+);
+/*----------*/
+create or replace function events.fn_tg_taske_comment()
+returns trigger as $$
+declare rowRecord record;
+declare objectJson json;
+declare objectJsonOld json;
+begin
+
+	case
+		when tg_op = 'DELETE' then 
+			rowRecord := old;
+		else		
+			rowRecord := new;
+	end case;
+
+    objectJson := json_agg(rowRecord)::json->0;
+
+    if tg_op = 'UPDATE' then
+        
+        objectJsonOld := json_agg(old)::json->0;
+
+        if objectJson::text = objectJsonOld::text then
+            return rowRecord;
+        end if;
+
+    end if;
+    
+    insert into events.taske_comment (TaskeCommentId, EventUser, Event, Object) 
+    values (rowRecord.Id, rowRecord.LastEventByUser, tg_op, objectJson);
+	
+	return rowRecord;
+end;
+$$ language plpgsql;
+/*----------*/
+create trigger tg_pt_taske_comment_in
+after insert on taske_comment
+for each row
+execute procedure events.fn_tg_taske_comment();
+/*----------*/
+create trigger tg_pt_taske_comment_up
+after update on taske_comment
+for each row
+execute procedure events.fn_tg_taske_comment();
+/*----------*/
+create trigger tg_pt_taske_comment_de
+before delete on taske_comment
+for each row
+execute procedure events.fn_tg_taske_comment();
+/*######################## </project> ########################*/
