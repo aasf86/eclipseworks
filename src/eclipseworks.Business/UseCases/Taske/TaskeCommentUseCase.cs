@@ -5,7 +5,6 @@ using eclipseworks.Domain.Contracts.Repositories.Taske;
 using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
 using System.Data;
-using static eclipseworks.Domain.Entities.Taske;
 using static eclipseworks.Domain.Entities.TaskeComment;
 
 namespace eclipseworks.Business.UseCases.Taske
@@ -15,13 +14,19 @@ namespace eclipseworks.Business.UseCases.Taske
         private readonly ITaskeCommentRepository<TaskeCommentModel> _taskeCommentRepository;
         private ITaskeCommentRepository<TaskeCommentModel> TaskeCommentRepository => _taskeCommentRepository;
 
+        private readonly ITaskeRepository<TaskeModel> _taskeRepository;
+        private ITaskeRepository<TaskeModel> TaskeRepository => _taskeRepository;
+
         public TaskeCommentUseCase(
             ILogger<TaskeCommentUseCase> logger,
             ITaskeCommentRepository<TaskeCommentModel> taskeCommentRepository,
+            ITaskeRepository<TaskeModel> taskeRepository,
             IDbConnection dbConnection) : base(logger, dbConnection)
         {
             _taskeCommentRepository = taskeCommentRepository;
+            _taskeRepository = taskeRepository;
             TransactionAssigner.Add(TaskeCommentRepository.SetTransaction);
+            TransactionAssigner.Add(TaskeRepository.SetTransaction);
         }
 
         public async Task<ResponseBase<long>> Insert(RequestBase<TaskeCommentInsert> commentInsertRequest)
@@ -45,10 +50,18 @@ namespace eclipseworks.Business.UseCases.Taske
                     return commentInsertResponse;
                 }
                 
-                var commentEntity = new TaskeCommentModel(commentInsert.Comment, commentInsert.UserOwner);
+                var commentEntity = new TaskeCommentModel(commentInsert.Comment, commentInsert.UserOwner, long.Parse(commentInsert.TaskeId));
                 
                 await UnitOfWorkExecute(async () =>
                 {
+                    var taskeFromDb = await TaskeRepository.GetById(commentEntity.TaskeId);
+
+                    if (taskeFromDb is null)
+                    {
+                        commentInsertResponse.Errors.Add(TaskeCommentMsgDialog.InvalidTaskeId);
+                        return;
+                    }
+
                     await TaskeCommentRepository.Insert(commentEntity);
                     commentInsertResponse.Data = commentEntity.Id;
                 });

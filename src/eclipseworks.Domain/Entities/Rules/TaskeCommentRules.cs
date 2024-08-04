@@ -16,6 +16,8 @@
             public const string RequiredComment = "Informe um comentário.";
             public const string RequiredUser = "Informe o usuário do comentário.";
             public const string NotFound = "Comentário não encontada.";
+            public const string RequiredTaskeId = "Informe a tarefa do comentário.";
+            public const string InvalidTaskeId = "Informe a tarefa válida ao comentário.";
         }
     }
 }

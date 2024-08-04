@@ -3,9 +3,12 @@ using static eclipseworks.Domain.Entities.TaskeComment;
 
 namespace eclipseworks.Business.Dtos.Taske
 {
-    public class TaskeCommentInsert
+    public class TaskeCommentInsert : IValidatableObject
     {
         public string Id { get; private set; } = "";
+
+        [Required(ErrorMessage = TaskeCommentMsgDialog.RequiredTaskeId)]
+        public string TaskeId { get; set; }
 
         [MinLength(TaskeCommentRule.CommentMinimalLenth, ErrorMessage = TaskeCommentMsgDialog.InvalidComment)]
         [Required(ErrorMessage = TaskeCommentMsgDialog.RequiredComment)]
@@ -19,6 +22,12 @@ namespace eclipseworks.Business.Dtos.Taske
             UserOwner = userOwner;
             return this;
         }
-        public void SetId(string id) => Id = id;        
+        public void SetId(string id) => Id = id;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrWhiteSpace(TaskeId) || !long.TryParse(TaskeId, out var idOut) || idOut <= 0)
+                yield return new ValidationResult(TaskeCommentMsgDialog.RequiredTaskeId, ["TaskeId"]);
+        }
     }
 }

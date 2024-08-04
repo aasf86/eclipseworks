@@ -1,6 +1,7 @@
 ﻿using eclipseworks.Business.Contracts.UseCases.Taske;
 using eclipseworks.Business.Dtos;
 using eclipseworks.Business.Dtos.Taske;
+using eclipseworks.Domain.Contracts.Repositories.Project;
 using eclipseworks.Domain.Contracts.Repositories.Taske;
 using eclipseworks.Infrastructure.EntitiesModels;
 using Microsoft.Extensions.Logging;
@@ -12,15 +13,21 @@ namespace eclipseworks.Business.UseCases.Taske
     public class TaskeUseCase : UseCaseBase, ITaskeUseCase
     {
         private readonly ITaskeRepository<TaskeModel> _taskeRepository;
-        private ITaskeRepository<TaskeModel> TaskeRepository => _taskeRepository;        
+        private ITaskeRepository<TaskeModel> TaskeRepository => _taskeRepository;
+
+        private readonly IProjectRepository<ProjectModel> _projectRepository;
+        private IProjectRepository<ProjectModel> ProjectRepository => _projectRepository;
 
         public TaskeUseCase(
             ILogger<TaskeUseCase> logger, 
             ITaskeRepository<TaskeModel> taskeRepository,
+            IProjectRepository<ProjectModel> projectRepository,
             IDbConnection dbConnection) : base(logger, dbConnection) 
         {
-            _taskeRepository = taskeRepository;            
+            _taskeRepository = taskeRepository;
+            _projectRepository = projectRepository;
             TransactionAssigner.Add(TaskeRepository.SetTransaction);
+            TransactionAssigner.Add(ProjectRepository.SetTransaction);
         }
 
         public async Task<ResponseBase<long>> Insert(RequestBase<TaskeInsert> taskeInsertRequest)
@@ -55,6 +62,14 @@ namespace eclipseworks.Business.UseCases.Taske
 
                 await UnitOfWorkExecute(async () =>
                 {
+                    var projectFromDb = await ProjectRepository.GetById(taskeEntity.ProjectId);
+
+                    if (projectFromDb is null)
+                    {
+                        taskeInsertResponse.Errors.Add(TaskeMsgDialog.InvalidProjectId);                        
+                        return;
+                    }
+
                     var limitReached = await TaskeRepository.TaskeLimitReached(taskeEntity.ProjectId, TaskeRule.MaximumNumberTaskesPerProject);
 
                     if (limitReached)
@@ -220,7 +235,7 @@ namespace eclipseworks.Business.UseCases.Taske
                 });
 
                 return taskeDeleteResponse;
-            }
+            }           
             catch (Exception exc)
             {
                 "Erro [Delete] tarefa: {TaskeId}".LogErr(taskeDeleteRequest.Data.Id);

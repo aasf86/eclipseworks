@@ -198,7 +198,6 @@ execute procedure events.fn_tg_taske();
 /*######################## </taske> ########################*/
 
 /*######################## <taske_comment> ########################*/
-
 create table if not exists taske_comment
 (
 	Id bigserial not null primary key,
@@ -207,6 +206,7 @@ create table if not exists taske_comment
     Updated timestamp without time zone NOT NULL DEFAULT now(),
     LastEventByUser varchar(100),
 
+    TaskeId bigint not null references taske(id) on delete cascade,
     Comment varchar(500) not null, /*aasf86 faltou definir o size no pedido, colocar isso na 2ª fase*/
     UserOwner varchar(100)
 );
@@ -220,6 +220,8 @@ create table if not exists events.taske_comment
     Inserted timestamp without time zone NOT NULL DEFAULT now(),
     EventUser varchar(100),
     Event varchar(100),
+
+    TaskeLastEventId bigint,
     Object json    
 );
 /*----------*/
@@ -248,10 +250,22 @@ begin
         end if;
 
     end if;
+
+    insert into events.taske_comment 
+    (TaskeCommentId, 
+     EventUser, 
+     Event, 
+     TaskeLastEventId, 
+     Object) 
+    select 
+        rowRecord.Id, 
+        rowRecord.LastEventByUser, 
+        tg_op,         
+        max(t.Id),
+        objectJson
+    from events.taske t 
+    where t.TaskeId = rowRecord.TaskeId;
     
-    insert into events.taske_comment (TaskeCommentId, EventUser, Event, Object) 
-    values (rowRecord.Id, rowRecord.LastEventByUser, tg_op, objectJson);
-	
 	return rowRecord;
 end;
 $$ language plpgsql;

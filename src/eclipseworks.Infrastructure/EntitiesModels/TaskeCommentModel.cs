@@ -11,7 +11,7 @@ namespace eclipseworks.Infrastructure.EntitiesModels
 
         public TaskeCommentModel() { }
 
-        public TaskeCommentModel(string comment, string userOwner) : base(comment, userOwner)
+        public TaskeCommentModel(string comment, string userOwner, long taskeId) : base(comment, userOwner, taskeId)
         {
             SetLastEventByUser(userOwner);
         }
