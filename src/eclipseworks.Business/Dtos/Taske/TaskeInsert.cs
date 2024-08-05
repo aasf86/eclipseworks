@@ -43,6 +43,12 @@ namespace eclipseworks.Business.Dtos.Taske
         {
             if (string.IsNullOrWhiteSpace(ProjectId) || !long.TryParse(ProjectId, out var idOut) || idOut <= 0)
                 yield return new ValidationResult(TaskeMsgDialog.InvalidProjectId, ["ProjectId"]);
+
+            if (Status == eStatus.Nulo)
+                yield return new ValidationResult(TaskeMsgDialog.RequiredStatus, ["Status"]);
+
+            if (Priority == ePriority.Nulo)
+                yield return new ValidationResult(TaskeMsgDialog.RequiredPriority, ["Priority"]);
         }
     }
 }
