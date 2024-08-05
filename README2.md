@@ -7,7 +7,7 @@
     - Ex: Projeto=>Nome|literal(size=150)
 - Definir permissões e perfis de acesso ao sistema.
 - No caso do relatório, a verificação de acesso ficou comentada aguardando um IDP SSO OAuth 2.
-    - Aqui será verificado a role 'RoleTypeClaim.Manager'
+    - Aqui será verificado a role 'RoleTypeClaim.Manager'(Gerente)
         ```csharp
             [Route("api/[controller]")]
             [ApiController]
@@ -35,7 +35,7 @@
                 }
             }
         ```
-    - No TaskeUseCase.cs também será verificado a role 'RoleTypeClaim.Manager', caso seja usado via pacote nuget
+    - No TaskeUseCase.cs também será verificado a role 'RoleTypeClaim.Manager'(Gerente), caso seja usado via pacote nuget
         ```csharp
             public class TaskeUseCase
             {
